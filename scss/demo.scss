@@ -2,7 +2,8 @@
 @import "~@reuters-graphics/style-color/scss/thematic/brand";
 
 $CountryRankingStrips-container: '#chart';
-
+$text-color: rgba(255, 255, 255, 0.75);
+$dark-blue: #2f353f;
 @import 'chart';
 
 // Some styles for the preview page...
@@ -10,7 +11,9 @@ $CountryRankingStrips-container: '#chart';
 #{$CountryRankingStrips-container} {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
-
+body {
+  background-color: $dark-blue;
+}
 nav.nav{
   padding: 20px 0;
   text-align: center;

@@ -1,5 +1,32 @@
 #{$CountryRankingStrips-container} {
 
+  $text-color: rgba(255, 255, 255, 0.75);
+  $dark-blue: #2f353f;
+  $area-color: rgba(255, 255, 255, 0.35);
+
   /* Write your chart styles here */
+
+  .CountryRankingStrips {
+    background-color: $dark-blue;
+    overflow: visible;
+    svg {
+      overflow: visible;
+    }
+    path.distribution-area {
+      opacity: 0.55;
+      stroke: none;
+      fill: $area-color;
+    }
+    path.distribution-line {
+      fill: none;
+      stroke-width: 0;
+      stroke: $text-color;
+    }
+    .highlights {
+      fill: $text-color;
+      stroke-width: 0;
+      stroke: $text-color;
+    }
+  }
 
 }
