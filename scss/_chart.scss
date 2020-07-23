@@ -2,7 +2,7 @@
 
   $text-color: rgba(255, 255, 255, 0.75);
   $dark-blue: #2f353f;
-  $area-color: rgba(255, 255, 255, 0.35);
+  $area-color: rgba(255, 255, 255, 0.25);
 
   /* Write your chart styles here */
 
@@ -13,19 +13,48 @@
       overflow: visible;
     }
     path.distribution-area {
-      opacity: 0.55;
+      opacity: 1;
       stroke: none;
       fill: $area-color;
     }
     path.distribution-line {
       fill: none;
       stroke-width: 0;
-      stroke: $text-color;
+      stroke: $area-color;
+      stroke-linecap: round;
     }
     .highlights {
-      fill: $text-color;
-      stroke-width: 0;
-      stroke: $text-color;
+      rect{
+        fill: $text-color;
+        stroke-width: 0;
+        stroke: $text-color;
+      }
+      .marker-g {
+        path {
+          stroke: $text-color;
+          stroke-width: 1;
+        }
+        text {
+          // font-family: $font-family-sans-serif;
+          fill: $text-color;
+          font-size: 0.8rem;
+        }
+      }
+
+    }
+    .axis {
+      path.domain {
+        stroke: none;
+      }
+      text{
+        font-family: $font-family-sans-serif;
+        fill: #999;
+        font-size: 0.8rem;
+      }
+      line{
+        stroke-width: 0.7;
+        stroke: #999;
+      }
     }
   }
 

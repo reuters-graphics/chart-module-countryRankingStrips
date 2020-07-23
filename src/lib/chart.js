@@ -1,5 +1,6 @@
 import ChartComponent from './base/ChartComponent';
 import d3 from './utils/d3';
+import D3Locale from '@reuters-graphics/d3-locale';
 import defaultData from './defaultData.json';
 
 class CountryRankingStrips extends ChartComponent {
@@ -11,7 +12,7 @@ class CountryRankingStrips extends ChartComponent {
     },
     distributionProps: {
       bandwidth: 0.5,
-      threshold: 30,
+      threshold: 35,
       xTicks: 5,
       curveType: 'curveBasis',
     },
@@ -22,12 +23,21 @@ class CountryRankingStrips extends ChartComponent {
       bottom: 20,
       left: 20,
     },
-    markDataPoint: [
+    markDataPoint: [// key should be same as dataParams
       {
-        key: 'IN',
-        text: 'India',
+        key: 'US',
+        // text: 'India',
+      },
+      {
+        key: 'YE',
+        // text: 'Yemen',
       },
     ],
+    annotation: {
+      size: 500,
+      offset: 6,
+      // orient: 'right', // left or right
+    },
   };
 
   defaultData = defaultData;
@@ -42,8 +52,14 @@ class CountryRankingStrips extends ChartComponent {
     const transition = d3.transition()
       .duration(750);
 
+    // number formatters
+    const locale = new D3Locale(props.locale);
+    const numFormat = locale.format(',');
+
     // DEFINE SCALES
-    const data = allData.filter(d => d[props.dataParams.value]);
+    // filter null and NaN, keep 0's
+    const data = allData.filter(d => parseFloat(d[props.dataParams.value]) !== 'null' && !isNaN(parseFloat(d[props.dataParams.value])));
+
     const dataValues = data.map(d => d[props.dataParams.value]);
     // console.log(d3.extent(dataValues));
     const xScale = d3.scaleLinear()
@@ -99,10 +115,10 @@ class CountryRankingStrips extends ChartComponent {
       .attr('transform', `translate(0,${props.height - props.margin.bottom})`)
       .call(
         d3.axisBottom(xScale)
-          .tickValues(thresholds)
-          // .tickValues(xScale.domain())
+          // .tickValues(thresholds)
+          .tickValues(xScale.domain())
           // .ticks(props.distributionProps.xTicks)
-          // .tickFormat(dateFormat)
+          .tickFormat(numFormat)
       );
 
     // chartSVG.appendSelect('g.axis-y')
@@ -113,6 +129,22 @@ class CountryRankingStrips extends ChartComponent {
     // add distribution path
     const plot = chartSVG.appendSelect('g.plot')
       .attr('class', 'plot');
+
+    plot.appendSelect('path.distribution-area')
+      .attr('class', 'area distribution-area')
+      .datum(density)
+      .transition(transition)
+      .attr('stroke-linejoin', 'round')
+      .attr('d', distributionArea);
+
+    // console.log('area', d3.polygonArea((density)));
+
+    plot.appendSelect('path.distribution-line')
+      .attr('class', 'line distribution-line')
+      .datum(density)
+      .transition(transition)
+      .attr('stroke-linejoin', 'round')
+      .attr('d', distributionLine);
 
     // RUGPLOT
     // const rugs = plot.append('g').selectAll('rect')
@@ -142,23 +174,34 @@ class CountryRankingStrips extends ChartComponent {
     //   .attr('width', d => xScale(d.x1) - xScale(d.x0) - 1)
     //   .attr('height', d => yScale(0) - yScale(d.length / data.length));
 
-    plot.appendSelect('path.distribution-area')
-      .attr('class', 'area distribution-area')
-      .datum(density)
-      .transition(transition)
-      .attr('stroke-linejoin', 'round')
-      .attr('d', distributionArea);
-
-    console.log('area', d3.polygonArea((density)));
-
-    plot.appendSelect('path.distribution-line')
-      .attr('class', 'line distribution-line')
-      .datum(density)
-      .transition(transition)
-      .attr('stroke-linejoin', 'round')
-      .attr('d', distributionLine);
-
     // HIGHLIGHT DATA PONT
+    // set data point
+    const markerData = props.markDataPoint.map(element => {
+      const val = element[props.dataParams.value] ? element[props.dataParams.value] : allData.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value];
+
+      let posDist = 0;
+      const posBin = bins.find((element, i) => {
+        posDist = i;
+        return element.includes(val);
+      });
+
+      const densityScale = d3.scaleLinear()
+        .domain([posBin.x0, posBin.x1])
+        .range([density[posDist][1], density[posDist + 1][1]]);
+
+      return {
+        key: element[props.dataParams.key],
+        value: val,
+        text: element.text,
+        densityIndex: posDist,
+        density: densityScale(val),
+        bin: posBin,
+      };
+    });
+    // width of highlight rect
+    const highlightWidth = width / data.length;
+
+    console.log(markerData);
 
     // add distrubution clipping mask
     const svgDefs = chartSVG.appendSelect('defs');
@@ -166,40 +209,97 @@ class CountryRankingStrips extends ChartComponent {
     svgDefs.appendSelect('clipPath')
       .attr('id', 'clip-path')
       .appendSelect('path')
+      .transition(transition)
       .attr('d', distributionArea(density));
 
     // add highlight shape
     const highlightGroup = chartSVG.appendSelect('g.highlights')
       .attr('class', 'highlights');
     const highlights = highlightGroup.selectAll('rect')
-      .data(props.markDataPoint);
+      .data(markerData);
 
     highlights.enter().append('rect')
       .attr('class', d => `${d.key}`)
-      .attr('data-value', d => {
-        return (d.value) ? `${d.value}` : `${allData.find(e => e.key === d.key)[props.dataParams.value]}`;
-      })
-      .attr('x', d => d.value ? xScale(d.value) : xScale(allData.find(e => e.key === d.key)[props.dataParams.value]))
+      .attr('data-value', d => d.value)
+      .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
       .attr('y', props.height - props.margin.bottom)
-      .attr('height', 0)
-      .attr('width', width / data.length)
+      .attr('height', props.height - props.margin.top - props.margin.bottom)
+      .attr('width', highlightWidth)
       .style('clip-path', 'url(#clip-path)')
       .merge(highlights)
-      .transition(transition.delay(0).duration(1000))
+      .transition(transition.delay(50).duration(750))
       .attr('class', d => `${d.key}`)
-      .attr('data-value', d => {
-        return (d.value) ? `${d.value}` : `${allData.find(e => e.key === d.key)[props.dataParams.value]}`;
-      })
-      .attr('x', d => d.value ? xScale(d.value) : xScale(allData.find(e => e.key === d.key)[props.dataParams.value]))
+      .attr('data-value', d => d.value)
+      .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
       .attr('y', props.margin.top)
       .attr('height', props.height - props.margin.top - props.margin.bottom)
-      .attr('width', width / data.length)
+      .attr('width', highlightWidth)
       .style('clip-path', 'url(#clip-path)');
 
     highlights.exit()
       .attr('height', 0)
       .transition(transition)
       .remove();
+
+    // add highlight marker for annotation
+    const arc = {};
+    arc.right = {
+      draw: function(context, size) {
+        const r = Math.sqrt(2 * size / Math.PI);
+        // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
+        context.arc(r, -props.annotation.offset, r, Math.PI, -Math.PI / 2, false);
+      },
+    };
+    arc.left = {
+      draw: function(context, size) {
+        const r = Math.sqrt(2 * size / Math.PI);
+        // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
+        context.arc(-r, -props.annotation.offset, r, 0, -Math.PI / 2, true);
+      },
+    };
+
+    const pointerSymbol = d3.symbol().type(arc[props.annotation.orient]).size(props.annotation.size);
+    const arcRadius = Math.sqrt(2 * props.annotation.size / Math.PI);
+
+    // const symBolMarker = props.markDataPoint.map(d => {
+    //   return {
+    //     key: d[props.dataParams.key],
+    //     line: [
+    //       [25, -25], [20, -25], [5, -20], [0, 0],
+    //     ],
+    //   };
+    // });
+    // const pathMarker = d3.line()
+    //   .curve(d3.curveBasis)
+    //   .x(d => (d[0]))
+    //   .y(d => (d[1]));
+
+    const highlightMarkers = highlightGroup.selectAll('g.marker-g')
+      .data(markerData, d => d.key);
+
+    const markerG = highlightMarkers.enter().append('g')
+      .attr('class', d => `marker-g ${d.key}`)
+      .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
+
+    markerG.append('path')
+      .attr('class', d => `marker ${d.key}`)
+      .attr('fill', 'none')
+      .attr('d', d => props.annotation.orient ? pointerSymbol() :
+        (
+          xScale(d.value) >= width / 5 ? d3.symbol().type(arc.left).size(props.annotation.size)() : d3.symbol().type(arc.right).size(props.annotation.size)()
+        ));
+    markerG.append('text')
+      .attr('transform', d => xScale(d.value) >= width / 5 ? `translate(${-arcRadius - 6}, ${-arcRadius - 6})` : `translate(${arcRadius + 6}, ${-arcRadius - 6})`)
+      .attr('text-anchor', d => xScale(d.value) >= width / 5 ? 'end' : 'start')
+      .append('tspan')
+      .text(d => d.text ? `${d.text}` : `${d.key}`);
+
+    highlightMarkers
+      .merge(highlightMarkers)
+      .transition(transition)
+      .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
+
+    highlightMarkers.exit().remove();
 
     // FOR HIGHLIGHTING THE BIN WITH THE DATA POINT
     // const dataHighlight = bins.find(element => {
@@ -208,11 +308,11 @@ class CountryRankingStrips extends ChartComponent {
 
     // console.log((dataHighlight));
 
-    // const pathHighlight = (d) => {
+    // const posHighlight = (d) => {
     //   return [
     //     [(d.x0), (0)],
-    //     [(d.x0), (0.3)],
-    //     [(d.x1), (0.3)],
+    //     [(d.x0), density[(d.x0)][1]],
+    //     [(d.x1), density[(d.x1)][1]],
     //     [(d.x1), (0)],
     //   ];
     // };
