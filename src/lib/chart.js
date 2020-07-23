@@ -1,7 +1,6 @@
 import ChartComponent from './base/ChartComponent';
 import d3 from './utils/d3';
 import D3Locale from '@reuters-graphics/d3-locale';
-import defaultData from './defaultData.json';
 
 class CountryRankingStrips extends ChartComponent {
   defaultProps = {
@@ -23,16 +22,18 @@ class CountryRankingStrips extends ChartComponent {
       bottom: 20,
       left: 20,
     },
-    markDataPoint: [// key should be same as dataParams
-      {
-        key: 'US',
-        // text: 'India',
-      },
-      {
-        key: 'YE',
-        // text: 'Yemen',
-      },
-    ],
+    rugPlot: false,
+    histogram: false,
+    // markDataPoint: [// key should be same as dataParams
+    //   {
+    //     key: 'US',
+    //     // text: 'India',
+    //   },
+    //   {
+    //     key: 'YE',
+    //     // text: 'Yemen',
+    //   },
+    // ],
     annotation: {
       size: 500,
       offset: 6,
@@ -40,7 +41,7 @@ class CountryRankingStrips extends ChartComponent {
     },
   };
 
-  defaultData = defaultData;
+  // defaultData = defaultData;
 
   draw() {
     const allData = this.data();
@@ -98,8 +99,8 @@ class CountryRankingStrips extends ChartComponent {
 
     // console.log(yScale.domain());
 
-    console.log('density', density);
-    console.log('bins', bins);
+    // console.log('density', density);
+    // console.log('bins', bins);
 
     // DRAW CHART
     const chartSVG = this.selection()
@@ -147,166 +148,171 @@ class CountryRankingStrips extends ChartComponent {
       .attr('d', distributionLine);
 
     // RUGPLOT
-    // const rugs = plot.append('g').selectAll('rect')
-    //   .data(data.filter(d => d.value >= 19 && d.value <= 28));
-    // rugs.enter().append('rect')
-    //   .attr('class', d => `${d.key}`)
-    //   .attr('data-value', d => `${d.value}`)
-    //   .attr('x', d => xScale(d.value))
-    //   .attr('y', props.margin.top)
-    //   .attr('height', props.height - props.margin.top - props.margin.bottom)
-    //   .attr('width', width / data.length)
-    //   .style('mix-blend-mode', 'multiply')
-    //   .attr('stroke', 1)
-    //   .attr('fill', 'orange');
+    if (props.rugPlot) {
+      const rugs = plot.append('g').selectAll('rect')
+        .data(data);
+      rugs.enter().append('rect')
+        .attr('class', d => `${d.key}`)
+        .attr('data-value', d => `${d.value}`)
+        .attr('x', d => xScale(d.value))
+        .attr('y', props.margin.top)
+        .attr('height', props.height - props.margin.top - props.margin.bottom)
+        .attr('width', width / data.length)
+        .style('mix-blend-mode', 'multiply')
+        .attr('stroke', 1)
+        .attr('fill', 'orange');
+    }
 
     // HISTOGRAM CODE
-    // plot.append('g')
-    //   .attr('fill', '#bbb')
-    //   .selectAll('rect')
-    //   .data(bins)
-    //   .join('rect')
-    //   .attr('x', d => xScale(d.x0) + 1)
-    //   .attr('y', d => {
-    //     // console.log(d.length, data.length);
-    //     return yScale(d.length / data.length);
-    //   })
-    //   .attr('width', d => xScale(d.x1) - xScale(d.x0) - 1)
-    //   .attr('height', d => yScale(0) - yScale(d.length / data.length));
+    if (props.histogram) {
+      plot.append('g')
+        .attr('fill', '#bbb')
+        .selectAll('rect')
+        .data(bins)
+        .join('rect')
+        .attr('x', d => xScale(d.x0) + 1)
+        .attr('y', d => {
+        // console.log(d.length, data.length);
+          return yScale(d.length / data.length);
+        })
+        .attr('width', d => xScale(d.x1) - xScale(d.x0) - 1)
+        .attr('height', d => yScale(0) - yScale(d.length / data.length));
+    }
 
     // HIGHLIGHT DATA PONT
-    // set data point
-    const markerData = props.markDataPoint.map(element => {
-      const val = element[props.dataParams.value] ? element[props.dataParams.value] : allData.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value];
+    if (props.markDataPoint) {
+      // set data point
+      const markerData = props.markDataPoint.map(element => {
+        const val = element[props.dataParams.value] ? element[props.dataParams.value] : allData.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value];
 
-      let posDist = 0;
-      const posBin = bins.find((element, i) => {
-        posDist = i;
-        return element.includes(val);
+        let posDist = 0;
+        const posBin = bins.find((element, i) => {
+          posDist = i;
+          return element.includes(val);
+        });
+
+        const densityScale = d3.scaleLinear()
+          .domain([posBin.x0, posBin.x1])
+          .range([density[posDist][1], density[posDist + 1][1]]);
+
+        return {
+          key: element[props.dataParams.key],
+          value: val,
+          text: element.text,
+          densityIndex: posDist,
+          density: densityScale(val),
+          bin: posBin,
+        };
       });
+      // width of highlight rect
+      const highlightWidth = width / data.length;
 
-      const densityScale = d3.scaleLinear()
-        .domain([posBin.x0, posBin.x1])
-        .range([density[posDist][1], density[posDist + 1][1]]);
+      // console.log(markerData);
 
-      return {
-        key: element[props.dataParams.key],
-        value: val,
-        text: element.text,
-        densityIndex: posDist,
-        density: densityScale(val),
-        bin: posBin,
+      // add distrubution clipping mask
+      const svgDefs = chartSVG.appendSelect('defs');
+
+      svgDefs.appendSelect('clipPath')
+        .attr('id', 'clip-path')
+        .appendSelect('path')
+        .transition(transition)
+        .attr('d', distributionArea(density));
+
+      // add highlight shape
+      const highlightGroup = chartSVG.appendSelect('g.highlights')
+        .attr('class', 'highlights');
+      const highlights = highlightGroup.selectAll('rect')
+        .data(markerData);
+
+      highlights.enter().append('rect')
+        .attr('class', d => `${d.key}`)
+        .attr('data-value', d => d.value)
+        .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
+        .attr('y', props.height - props.margin.bottom)
+        .attr('height', props.height - props.margin.top - props.margin.bottom)
+        .attr('width', highlightWidth)
+        .style('clip-path', 'url(#clip-path)')
+        .merge(highlights)
+        .transition(transition.delay(50).duration(750))
+        .attr('class', d => `${d.key}`)
+        .attr('data-value', d => d.value)
+        .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
+        .attr('y', props.margin.top)
+        .attr('height', props.height - props.margin.top - props.margin.bottom)
+        .attr('width', highlightWidth)
+        .style('clip-path', 'url(#clip-path)');
+
+      highlights.exit()
+        .attr('height', 0)
+        .transition(transition)
+        .remove();
+
+      // add highlight marker for annotation
+      const arc = {};
+      arc.right = {
+        draw: function(context, size) {
+          const r = Math.sqrt(2 * size / Math.PI);
+          // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
+          context.arc(r, -props.annotation.offset, r, Math.PI, -Math.PI / 2, false);
+        },
       };
-    });
-    // width of highlight rect
-    const highlightWidth = width / data.length;
+      arc.left = {
+        draw: function(context, size) {
+          const r = Math.sqrt(2 * size / Math.PI);
+          // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
+          context.arc(-r, -props.annotation.offset, r, 0, -Math.PI / 2, true);
+        },
+      };
 
-    console.log(markerData);
+      const pointerSymbol = d3.symbol().type(arc[props.annotation.orient]).size(props.annotation.size);
+      const arcRadius = Math.sqrt(2 * props.annotation.size / Math.PI);
 
-    // add distrubution clipping mask
-    const svgDefs = chartSVG.appendSelect('defs');
+      // const symBolMarker = props.markDataPoint.map(d => {
+      //   return {
+      //     key: d[props.dataParams.key],
+      //     line: [
+      //       [25, -25], [20, -25], [5, -20], [0, 0],
+      //     ],
+      //   };
+      // });
+      // const pathMarker = d3.line()
+      //   .curve(d3.curveBasis)
+      //   .x(d => (d[0]))
+      //   .y(d => (d[1]));
 
-    svgDefs.appendSelect('clipPath')
-      .attr('id', 'clip-path')
-      .appendSelect('path')
-      .transition(transition)
-      .attr('d', distributionArea(density));
+      const highlightMarkers = highlightGroup.selectAll('g.marker-g')
+        .data(markerData, d => d.key);
 
-    // add highlight shape
-    const highlightGroup = chartSVG.appendSelect('g.highlights')
-      .attr('class', 'highlights');
-    const highlights = highlightGroup.selectAll('rect')
-      .data(markerData);
+      const markerG = highlightMarkers.enter().append('g')
+        .attr('class', d => `marker-g ${d.key}`)
+        .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
 
-    highlights.enter().append('rect')
-      .attr('class', d => `${d.key}`)
-      .attr('data-value', d => d.value)
-      .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
-      .attr('y', props.height - props.margin.bottom)
-      .attr('height', props.height - props.margin.top - props.margin.bottom)
-      .attr('width', highlightWidth)
-      .style('clip-path', 'url(#clip-path)')
-      .merge(highlights)
-      .transition(transition.delay(50).duration(750))
-      .attr('class', d => `${d.key}`)
-      .attr('data-value', d => d.value)
-      .attr('x', d => xScale(d.value) - 0.5 * highlightWidth)
-      .attr('y', props.margin.top)
-      .attr('height', props.height - props.margin.top - props.margin.bottom)
-      .attr('width', highlightWidth)
-      .style('clip-path', 'url(#clip-path)');
+      markerG.append('path')
+        .attr('class', d => `marker ${d.key}`)
+        .attr('fill', 'none')
+        .attr('d', d => props.annotation.orient ? pointerSymbol() :
+          (
+            xScale(d.value) >= width / 5 ? d3.symbol().type(arc.left).size(props.annotation.size)() : d3.symbol().type(arc.right).size(props.annotation.size)()
+          ));
+      markerG.append('text')
+        .attr('transform', d => xScale(d.value) >= width / 5 ? `translate(${-arcRadius - 6}, ${-arcRadius - 6})` : `translate(${arcRadius + 6}, ${-arcRadius - 6})`)
+        .attr('text-anchor', d => xScale(d.value) >= width / 5 ? 'end' : 'start')
+        .append('tspan')
+        .text(d => d.text ? `${d.text}` : `${d.key}`);
 
-    highlights.exit()
-      .attr('height', 0)
-      .transition(transition)
-      .remove();
+      highlightMarkers
+        .merge(highlightMarkers)
+        .transition(transition)
+        .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
 
-    // add highlight marker for annotation
-    const arc = {};
-    arc.right = {
-      draw: function(context, size) {
-        const r = Math.sqrt(2 * size / Math.PI);
-        // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
-        context.arc(r, -props.annotation.offset, r, Math.PI, -Math.PI / 2, false);
-      },
-    };
-    arc.left = {
-      draw: function(context, size) {
-        const r = Math.sqrt(2 * size / Math.PI);
-        // const orgin = (4 * r) / (3 * Math.PI); // the orgin of the circle
-        context.arc(-r, -props.annotation.offset, r, 0, -Math.PI / 2, true);
-      },
-    };
+      highlightMarkers.exit().remove();
 
-    const pointerSymbol = d3.symbol().type(arc[props.annotation.orient]).size(props.annotation.size);
-    const arcRadius = Math.sqrt(2 * props.annotation.size / Math.PI);
+      // FOR HIGHLIGHTING THE BIN WITH THE DATA POINT
+      // const dataHighlight = bins.find(element => {
+      //   return element.includes(6.2960862166761205);
+      // });
 
-    // const symBolMarker = props.markDataPoint.map(d => {
-    //   return {
-    //     key: d[props.dataParams.key],
-    //     line: [
-    //       [25, -25], [20, -25], [5, -20], [0, 0],
-    //     ],
-    //   };
-    // });
-    // const pathMarker = d3.line()
-    //   .curve(d3.curveBasis)
-    //   .x(d => (d[0]))
-    //   .y(d => (d[1]));
-
-    const highlightMarkers = highlightGroup.selectAll('g.marker-g')
-      .data(markerData, d => d.key);
-
-    const markerG = highlightMarkers.enter().append('g')
-      .attr('class', d => `marker-g ${d.key}`)
-      .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
-
-    markerG.append('path')
-      .attr('class', d => `marker ${d.key}`)
-      .attr('fill', 'none')
-      .attr('d', d => props.annotation.orient ? pointerSymbol() :
-        (
-          xScale(d.value) >= width / 5 ? d3.symbol().type(arc.left).size(props.annotation.size)() : d3.symbol().type(arc.right).size(props.annotation.size)()
-        ));
-    markerG.append('text')
-      .attr('transform', d => xScale(d.value) >= width / 5 ? `translate(${-arcRadius - 6}, ${-arcRadius - 6})` : `translate(${arcRadius + 6}, ${-arcRadius - 6})`)
-      .attr('text-anchor', d => xScale(d.value) >= width / 5 ? 'end' : 'start')
-      .append('tspan')
-      .text(d => d.text ? `${d.text}` : `${d.key}`);
-
-    highlightMarkers
-      .merge(highlightMarkers)
-      .transition(transition)
-      .attr('transform', d => `translate(${xScale(d.value)}, ${yScale(d.density)})`);
-
-    highlightMarkers.exit().remove();
-
-    // FOR HIGHLIGHTING THE BIN WITH THE DATA POINT
-    // const dataHighlight = bins.find(element => {
-    //   return element.includes(6.2960862166761205);
-    // });
-
-    // console.log((dataHighlight));
+      // console.log((dataHighlight));
 
     // const posHighlight = (d) => {
     //   return [
@@ -323,6 +329,7 @@ class CountryRankingStrips extends ChartComponent {
     //   .attr('fill', 'red')
     //   .style('clip-path', 'url(#clip-path)')
     //   .attr('d', distributionArea);
+    }
 
     return this;
   }

@@ -1075,6 +1075,13 @@
     eslint-plugin-react-hooks "*"
     eslint-plugin-standard "*"
 
+"@reuters-graphics/graphics-atlas-client@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@reuters-graphics/graphics-atlas-client/-/graphics-atlas-client-0.2.1.tgz#d876baa167b4520a9de492a074dfc52cf4a9cef1"
+  integrity sha512-j/meRnBGwt4gP7yzKcTWz0q4wGWQlmi26x84gnAbjpE3QtjhMu9dcq/7ll9bUIE1RIpnFy1AV1eDyXtiLmomsg==
+  dependencies:
+    lodash "^4.17.15"
+
 "@reuters-graphics/style-color@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@reuters-graphics/style-color/-/style-color-1.0.0.tgz#35fcf41d1c888b8353a0cb3f274bcdb10eea7d4b"
