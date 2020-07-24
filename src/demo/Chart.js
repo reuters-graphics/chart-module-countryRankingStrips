@@ -132,7 +132,7 @@ class ChartComponent extends React.Component {
           key: 'key',
           value: 'value',
         },
-        height: 100,
+        height: 50,
         margin: {
           top: 18,
           right: 18,
@@ -170,7 +170,7 @@ class ChartComponent extends React.Component {
           key: 'key',
           value: 'value',
         },
-        height: 100,
+        height: 50,
         margin: {
           top: 18,
           right: 18,
@@ -185,14 +185,6 @@ class ChartComponent extends React.Component {
               key: 'ES',
               // text: 'Spain',
             },
-            // {
-            //   key: 'ME',
-            //   text: 'ME',
-            // },
-            // {
-            //   key: 'US',
-            //   // text: 'ME',
-            // },
           ],
         },
       })

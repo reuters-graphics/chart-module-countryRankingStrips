@@ -13,11 +13,11 @@
     color: $text-color!important;
   }
   svg {
-    // overflow: visible;
+    overflow: visible;
   }
   .CountryRankingStrips {
     background-color: $dark-blue;
-    // overflow: visible;
+    overflow: visible;
     path.distribution-area {
       opacity: 1;
       stroke: none;

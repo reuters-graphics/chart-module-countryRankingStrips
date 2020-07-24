@@ -35,7 +35,9 @@ class CountryRankingStrips extends ChartComponent {
       customAxisLabels: ['left-label', 'right-label'],
       customAxisFormat: true,
       rugWidth: 1,
-      rugColor: 'rgba(255, 255, 255, 0.25)',
+      rugColor: 'rgba(255, 255, 255, 0.75)',
+      highlightWidth: 2,
+      highlightColor: '#eec331',
       // annotation: [
       //   {
       //     key: 'ES',
@@ -431,7 +433,11 @@ class CountryRankingStrips extends ChartComponent {
 
         // highlight the rugs
         markerData.forEach(element => {
-          d3.select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true');
+          d3.select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true')
+            .style('stroke-width', props.rugProps.highlightWidth / 2)
+            .style('stroke', props.rugProps.highlightColor)
+            .style('fill', props.rugProps.highlightColor)
+            .raise();
         });
       }
     }

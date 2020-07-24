@@ -28,12 +28,12 @@ myChart
     ]) 
   .props({ 
       locale: 'en',
-      chartTitle: 'europe cases',
+      chartTitle: 'global cases',
       dataParams: {
           key: 'key',
           value: 'value',
         },
-        height: 100,
+        height: 50,
         margin: {
           top: 18,
           right: 18,
@@ -43,15 +43,18 @@ myChart
         rugPlot: true,
         rugProps: {
           height: 16,
+          customAxisLabels: ['left-label', 'right-label'],
+          customAxisFormat: true,
+          rugWidth: 1,
+          rugColor: 'rgba(255, 255, 255, 0.75)',
+          highlightWidth: 2,
+          highlightColor: '#eec331',
           annotation: [
             {
               key: 'US',
               text: 'Lorem Ipsum US',
             },
-            {
-              key: 'IN',
-              text: 'Lorem Ipsum IN',
-            },
+            ...
           ],
         },
     })
@@ -138,7 +141,9 @@ rugProps: {
   customAxisLabels : ['left-label','right-label'], // Override default min-max number labels
   customAxisFormat: true, // show labels without ticks
   rugWidth: 1,
-  rugColor: 'rgba(255, 255, 255, 0.25)',
+  rugColor: 'rgba(255, 255, 255, 0.75)',
+  highlightWidth: 2, // adds half of this value as stroke
+  highlightColor: '#eec331', 
   annotation: [ // if no text is specified, shows just a pointer by default
      {
     key: 'US',
