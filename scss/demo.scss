@@ -1,9 +1,12 @@
 @import "~@reuters-graphics/style-theme-eisbaer/scss/main";
 @import "~@reuters-graphics/style-color/scss/thematic/brand";
 
-$CountryRankingStrips-container: '#chart';
+$CountryRankingStrips-container: '.chart';
 $text-color: rgba(255, 255, 255, 0.75);
 $dark-blue: #2f353f;
+$yellow: #fce587;
+$dark-yellow: #eec331;
+
 @import 'chart';
 
 // Some styles for the preview page...

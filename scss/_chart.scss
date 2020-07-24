@@ -3,15 +3,21 @@
   $text-color: rgba(255, 255, 255, 0.75);
   $dark-blue: #2f353f;
   $area-color: rgba(255, 255, 255, 0.25);
+  $yellow: #fce587;
+  $dark-yellow: #eec331;
 
   /* Write your chart styles here */
-
+  .chart-title  h6{
+    margin-top: 1rem;
+    font-weight: lighter;
+    color: $text-color!important;
+  }
+  svg {
+    // overflow: visible;
+  }
   .CountryRankingStrips {
     background-color: $dark-blue;
-    overflow: visible;
-    svg {
-      overflow: visible;
-    }
+    // overflow: visible;
     path.distribution-area {
       opacity: 1;
       stroke: none;
@@ -23,9 +29,22 @@
       stroke: $area-color;
       stroke-linecap: round;
     }
+    .rugplot{
+      rect {
+        fill: $area-color;
+        opacity: 0.75;
+        &.highlighted {
+          fill: $dark-yellow;
+          opacity: 1;
+        }
+      }
+    }
+    .histogram{
+      fill: $area-color;
+    }
     .highlights {
       rect{
-        fill: $text-color;
+        fill: $area-color;
         stroke-width: 0;
         stroke: $text-color;
       }
@@ -34,10 +53,15 @@
           stroke: $text-color;
           stroke-width: 1;
         }
+        path.marker-rug {
+          fill: $dark-yellow;
+          stroke: none;
+          // transform: rotate(180deg);
+        }
         text {
-          // font-family: $font-family-sans-serif;
-          fill: $text-color;
-          font-size: 0.8rem;
+          fill: $dark-yellow;
+          font-size: 1rem;
+          font-weight: bold;
         }
       }
 
