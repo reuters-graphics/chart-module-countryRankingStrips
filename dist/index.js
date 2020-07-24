@@ -479,7 +479,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         customAxisLabels: ['left-label', 'right-label'],
         customAxisFormat: true,
         rugWidth: 1,
-        rugColor: 'rgba(255, 255, 255, 0.25)' // annotation: [
+        rugColor: 'rgba(255, 255, 255, 0.75)',
+        highlightWidth: 2,
+        highlightColor: '#eec331' // annotation: [
         //   {
         //     key: 'ES',
         //     text: 'Spain',
@@ -762,7 +764,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             return {
               key: element[props.dataParams.key],
               value: val,
-              text: element.text || element[props.dataParams.key]
+              text: element.text || '' // text: element.text || element[props.dataParams.key],
+
             };
           });
 
@@ -796,7 +799,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
           d3.select("#".concat(node.id, " .highlights")).lower(); // highlight the rugs
 
           _markerData.forEach(function (element) {
-            d3.select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true');
+            d3.select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true').style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
           });
         }
       } // HISTOGRAM CODE
