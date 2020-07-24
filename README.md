@@ -86,7 +86,8 @@ dataParams: {
 },
 ```
 Height of the chart. ```height: 100```
-Margins
+
+Add Margins
 ```javascript
 margin: {
   top: 18,
