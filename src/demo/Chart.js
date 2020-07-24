@@ -127,6 +127,18 @@ class ChartComponent extends React.Component {
       .data(DATA.cases)
       .props({
         chartTitle: 'europe cases',
+        locale: 'en',
+        dataParams: {
+          key: 'key',
+          value: 'value',
+        },
+        height: 100,
+        margin: {
+          top: 18,
+          right: 18,
+          bottom: 20,
+          left: 4,
+        },
         rugPlot: true,
         rugProps: {
           height: 16,

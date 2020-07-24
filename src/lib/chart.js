@@ -5,7 +5,7 @@ import D3Locale from '@reuters-graphics/d3-locale';
 class CountryRankingStrips extends ChartComponent {
   defaultProps = {
     locale: 'en',
-    // chartTitle : "",
+    chartTitle: '',
     dataParams: {
       key: 'key',
       value: 'value',
