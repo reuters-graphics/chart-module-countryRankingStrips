@@ -34,6 +34,8 @@ class CountryRankingStrips extends ChartComponent {
       height: 16,
       customAxisLabels: ['left-label', 'right-label'],
       customAxisFormat: true,
+      rugWidth: 1,
+      rugColor: 'rgba(255, 255, 255, 0.25)',
       // annotation: [
       //   {
       //     key: 'ES',
@@ -347,10 +349,9 @@ class CountryRankingStrips extends ChartComponent {
         }
         // custom label format
         if (props.rugProps.customAxisFormat) {
-          d3.select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
+          d3.select(`#${node.id} .CountryRankingStrips .axis.axis-x`).classed('customAxisFormat', 'true');
         }
       }
-      const rugWidth = 1;
       const rugPlot = plot.appendSelect('g.rugplot')
         .attr('class', 'rugplot');
 
@@ -359,16 +360,17 @@ class CountryRankingStrips extends ChartComponent {
       rugs.enter().append('rect')
         .attr('class', d => `${d.key}`)
         // .attr('data-value', d => `${d.value}`)
-        .attr('x', d => xScale(d.value) - rugWidth / 2)
+        .style('fill', props.rugProps.rugColor)
+        .attr('x', d => xScale(d.value) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
-        .attr('width', rugWidth)
+        .attr('width', props.rugProps.rugWidth)
         .merge(rugs)
         .transition(transition)
-        .attr('x', d => xScale(d.value) - rugWidth / 2)
+        .attr('x', d => xScale(d.value) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
-        .attr('width', rugWidth);
+        .attr('width', props.rugProps.rugWidth);
 
       rugs.raise().exit().remove();
 
@@ -424,11 +426,11 @@ class CountryRankingStrips extends ChartComponent {
           .attr('transform', d => `translate(${xScale(d.value)}, ${rugPosition.y - markerPos})`);
 
         highlightMarkers.exit().remove();
-        d3.select('.highlights').lower();
+        d3.select(`#${node.id} .highlights`).lower();
 
         // highlight the rugs
         markerData.forEach(element => {
-          d3.select(`.CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true');
+          d3.select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true');
         });
       }
     }

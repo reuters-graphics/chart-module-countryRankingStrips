@@ -108,16 +108,16 @@ const dummyData = defaultData.map((d, i) => {
 class ChartComponent extends React.Component {
   state = { width: '' };
   chart1Container = React.createRef();
-  // chart2Container = React.createRef();
+  chart2Container = React.createRef();
 
   // Instantiate and add our chart class to this component.
   chart1 = new Chart();
-  // chart2 = new Chart();
+  chart2 = new Chart();
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
     this.chart1.draw();
-    // this.chart2.draw();
+    this.chart2.draw();
   }, 250);
 
   componentDidMount() {
@@ -126,7 +126,7 @@ class ChartComponent extends React.Component {
       .selection(this.chart1Container.current)
       .data(DATA.cases)
       .props({
-        chartTitle: 'europe cases',
+        chartTitle: 'global cases',
         locale: 'en',
         dataParams: {
           key: 'key',
@@ -147,42 +147,56 @@ class ChartComponent extends React.Component {
               key: 'ES',
               text: 'Spain',
             },
-            {
-              key: 'ME',
-              text: 'ME',
-            },
+            // {
+            //   key: 'ME',
+            //   text: 'ME',
+            // },
+            // {
+            //   key: 'US',
+            //   // text: 'ME',
+            // },
           ],
         },
       })
       .draw();
-    // Use our chart module.
-    // this.chart2
-    //   .selection(this.chart2Container.current)
-    //   .data(dataEurope1)
-    //   .props({
-    //     chartTitle: 'europe deaths',
-    //     distributionProps: {
-    //       bandwidth: 1,
-    //       threshold: 35,
-    //       xTicks: 5,
-    //       curveType: 'curveBasis',
-    //     },
-    //     markDataPoint: [// key should be same as dataParams
-    //       {
-    //         key: 'IT',
-    //         // text: 'India',
-    //       },
-    //       {
-    //         key: 'ES',
-    //         // text: 'India',
-    //       },
-    //       {
-    //         key: 'FR',
-    //         // text: 'India',
-    //       },
-    //     ],
-    //   })
-    //   .draw();
+
+    this.chart2
+      .selection(this.chart2Container.current)
+      .data(DATA.deaths)
+      .props({
+        chartTitle: 'global deaths',
+        locale: 'en',
+        dataParams: {
+          key: 'key',
+          value: 'value',
+        },
+        height: 100,
+        margin: {
+          top: 18,
+          right: 18,
+          bottom: 20,
+          left: 4,
+        },
+        rugPlot: true,
+        rugProps: {
+          height: 16,
+          annotation: [
+            {
+              key: 'ES',
+              text: 'Spain',
+            },
+            // {
+            //   key: 'ME',
+            //   text: 'ME',
+            // },
+            // {
+            //   key: 'US',
+            //   // text: 'ME',
+            // },
+          ],
+        },
+      })
+      .draw();
 
     // Add a listener to resize chart with the window.
     window.addEventListener('resize', this.resize);
@@ -197,7 +211,7 @@ class ChartComponent extends React.Component {
     // Update the chart with the component.
     // Can change data or props here, whatever...
     this.chart1.draw();
-    // this.chart2.draw();
+    this.chart2.draw();
   }
 
   render() {
@@ -206,7 +220,7 @@ class ChartComponent extends React.Component {
       <ChartContainer width={width} setWidth={(width) => this.setState({ width })}>
         {/* This is our chart container 👇 */}
         <div id='chart1' className='chart' ref={this.chart1Container} />
-        {/* <div id='chart2' className='chart' ref={this.chart2Container} /> */}
+        <div id='chart2' className='chart' ref={this.chart2Container} />
       </ChartContainer>
     );
   }

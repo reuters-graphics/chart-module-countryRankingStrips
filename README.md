@@ -137,6 +137,8 @@ rugProps: {
   height: 16,
   customAxisLabels : ['left-label','right-label'], // Override default min-max number labels
   customAxisFormat: true, // show labels without ticks
+  rugWidth: 1,
+  rugColor: 'rgba(255, 255, 255, 0.25)',
   annotation: [
      {
     key: 'US',
