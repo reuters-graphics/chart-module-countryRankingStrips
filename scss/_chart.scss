@@ -79,6 +79,17 @@
         stroke-width: 0.7;
         stroke: #999;
       }
+      &.customAxisFormat {
+        line {
+          stroke: none;
+        }
+        g.tick:first-of-type {
+          text-anchor: start;
+        }
+        g.tick:last-of-type {
+          text-anchor: end;
+        }
+      }
     }
   }
 

@@ -32,6 +32,8 @@ class CountryRankingStrips extends ChartComponent {
     rugPlot: true,
     rugProps: {
       height: 16,
+      customAxisLabels: ['left-label', 'right-label'],
+      customAxisFormat: true,
       // annotation: [
       //   {
       //     key: 'ES',
@@ -127,21 +129,23 @@ class CountryRankingStrips extends ChartComponent {
       .attr('class', 'plot');
 
     // add axis
-    chartSVG.appendSelect('g.axis-x')
-      .attr('class', 'axis axis-x')
-      .transition(transition)
-      .attr('transform', `translate(0,${props.height - props.margin.bottom})`)
-      .call(
-        d3.axisBottom(xScale)
+    if (props.histogram || props.densityPlot) {
+      chartSVG.appendSelect('g.axis-x')
+        .attr('class', 'axis axis-x')
+        .transition(transition)
+        .attr('transform', `translate(0,${props.height - props.margin.bottom})`)
+        .call(
+          d3.axisBottom(xScale)
           // .tickValues(thresholds)
-          .tickValues(xScale.domain())
-          .tickFormat(numFormat)
-      );
+            .tickValues(xScale.domain())
+            .tickFormat(numFormat)
+        );
 
     // chartSVG.appendSelect('g.axis-y')
     //   .attr('transform', `translate(${props.margin.left},0)`)
     //   .call(d3.axisLeft(yScale).ticks(null, '%'))
     //   .call(g => g.select('.domain').remove());
+    }
 
     if (props.densityPlot) {
       const distributionLine = d3.line()
@@ -322,9 +326,30 @@ class CountryRankingStrips extends ChartComponent {
         y: props.height - props.margin.bottom - props.rugProps.height - 4,
         height: props.rugProps.height,
       };
-      // if (props.histogram || props.densityPlot) {
-
-      // }
+      // add rugplot axis
+      if (!props.histogram || !props.densityPlot) {
+        const rugXAxis = chartSVG.appendSelect('g.axis-x')
+          .attr('class', 'axis axis-x')
+          .transition(transition)
+          .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
+        if (props.rugProps.customAxisLabels) {
+          rugXAxis.call(
+            d3.axisBottom(xScale)
+              .tickValues(xScale.domain())
+              .tickFormat((d, i) => props.rugProps.customAxisLabels[i])
+          );
+        } else {
+          rugXAxis.call(
+            d3.axisBottom(xScale)
+              .tickValues(xScale.domain())
+              .tickFormat(numFormat)
+          );
+        }
+        // custom label format
+        if (props.rugProps.customAxisFormat) {
+          d3.select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
+        }
+      }
       const rugWidth = 1;
       const rugPlot = plot.appendSelect('g.rugplot')
         .attr('class', 'rugplot');
@@ -403,7 +428,7 @@ class CountryRankingStrips extends ChartComponent {
 
         // highlight the rugs
         markerData.forEach(element => {
-          d3.select(`rect.${element.key}`).classed('highlighted', 'true');
+          d3.select(`.CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true');
         });
       }
     }

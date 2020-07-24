@@ -135,6 +135,8 @@ Customise the plot height and add labels
 ```javascript
 rugProps: {
   height: 16,
+  customAxisLabels : ['left-label','right-label'], // Override default min-max number labels
+  customAxisFormat: true, // show labels without ticks
   annotation: [
      {
     key: 'US',
