@@ -345,12 +345,12 @@ class CountryRankingStrips extends ChartComponent {
         .attr('height', rugPosition.height)
         .attr('width', rugWidth);
 
-      rugs.exit().remove();
+      rugs.raise().exit().remove();
 
       // add highlight
 
       if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
-        const highlightGroup = rugPlot.appendSelect('g.highlights')
+        const highlightGroup = chartSVG.appendSelect('g.highlights')
           .attr('class', 'highlights');
 
         highlightGroup.appendSelect('rect.highlight-bar')
@@ -399,8 +399,8 @@ class CountryRankingStrips extends ChartComponent {
           .attr('transform', d => `translate(${xScale(d.value)}, ${rugPosition.y - markerPos})`);
 
         highlightMarkers.exit().remove();
+        d3.select('.highlights').lower();
 
-        rugs.raise();
         // highlight the rugs
         markerData.forEach(element => {
           d3.select(`rect.${element.key}`).classed('highlighted', 'true');

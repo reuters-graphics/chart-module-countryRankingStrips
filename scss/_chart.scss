@@ -31,8 +31,8 @@
     }
     .rugplot{
       rect {
-        fill: $area-color;
-        opacity: 0.75;
+        fill: $text-color;
+        opacity: 0.55;
         &.highlighted {
           fill: $dark-yellow;
           opacity: 1;
