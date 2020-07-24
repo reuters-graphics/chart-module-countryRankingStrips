@@ -139,7 +139,7 @@ rugProps: {
   customAxisFormat: true, // show labels without ticks
   rugWidth: 1,
   rugColor: 'rgba(255, 255, 255, 0.25)',
-  annotation: [
+  annotation: [ // if no text is specified, shows just a pointer by default
      {
     key: 'US',
     text: 'Lorem Ipsum US',

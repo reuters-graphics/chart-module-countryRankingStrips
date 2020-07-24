@@ -145,7 +145,7 @@ class ChartComponent extends React.Component {
           annotation: [
             {
               key: 'ES',
-              text: 'Spain',
+              // text: 'Spain',
             },
             // {
             //   key: 'ME',
@@ -183,7 +183,7 @@ class ChartComponent extends React.Component {
           annotation: [
             {
               key: 'ES',
-              text: 'Spain',
+              // text: 'Spain',
             },
             // {
             //   key: 'ME',

@@ -396,7 +396,8 @@ class CountryRankingStrips extends ChartComponent {
           return {
             key: element[props.dataParams.key],
             value: val,
-            text: element.text || element[props.dataParams.key],
+            text: element.text || '',
+            // text: element.text || element[props.dataParams.key],
           };
         });
         const markerPos = Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) + 4;
