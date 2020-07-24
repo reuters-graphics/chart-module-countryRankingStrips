@@ -447,7 +447,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
     _defineProperty(_assertThisInitialized(_this), "defaultProps", {
       locale: 'en',
-      // chartTitle : "",
+      chartTitle: '',
       dataParams: {
         key: 'key',
         value: 'value'
@@ -475,7 +475,11 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       },
       rugPlot: true,
       rugProps: {
-        height: 16 // annotation: [
+        height: 16,
+        customAxisLabels: ['left-label', 'right-label'],
+        customAxisFormat: true,
+        rugWidth: 1,
+        rugColor: 'rgba(255, 255, 255, 0.25)' // annotation: [
         //   {
         //     key: 'ES',
         //     text: 'Spain',
@@ -565,11 +569,13 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
       var plot = chartSVG.appendSelect('g.plot').attr('class', 'plot'); // add axis
 
-      chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")")).call(d3.axisBottom(xScale) // .tickValues(thresholds)
-      .tickValues(xScale.domain()).tickFormat(numFormat)); // chartSVG.appendSelect('g.axis-y')
-      //   .attr('transform', `translate(${props.margin.left},0)`)
-      //   .call(d3.axisLeft(yScale).ticks(null, '%'))
-      //   .call(g => g.select('.domain').remove());
+      if (props.histogram || props.densityPlot) {
+        chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")")).call(d3.axisBottom(xScale) // .tickValues(thresholds)
+        .tickValues(xScale.domain()).tickFormat(numFormat)); // chartSVG.appendSelect('g.axis-y')
+        //   .attr('transform', `translate(${props.margin.left},0)`)
+        //   .call(d3.axisLeft(yScale).ticks(null, '%'))
+        //   .call(g => g.select('.domain').remove());
+      }
 
       if (props.densityPlot) {
         var distributionLine = d3.line().curve(d3[props.distributionProps.curveType]).x(function (d) {
@@ -713,20 +719,35 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         var rugPosition = {
           y: props.height - props.margin.bottom - props.rugProps.height - 4,
           height: props.rugProps.height
-        }; // if (props.histogram || props.densityPlot) {
-        // }
+        }; // add rugplot axis
 
-        var rugWidth = 1;
+        if (!props.histogram || !props.densityPlot) {
+          var rugXAxis = chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
+
+          if (props.rugProps.customAxisLabels) {
+            rugXAxis.call(d3.axisBottom(xScale).tickValues(xScale.domain()).tickFormat(function (d, i) {
+              return props.rugProps.customAxisLabels[i];
+            }));
+          } else {
+            rugXAxis.call(d3.axisBottom(xScale).tickValues(xScale.domain()).tickFormat(numFormat));
+          } // custom label format
+
+
+          if (props.rugProps.customAxisFormat) {
+            d3.select("#".concat(node.id, " .CountryRankingStrips .axis.axis-x")).classed('customAxisFormat', 'true');
+          }
+        }
+
         var rugPlot = plot.appendSelect('g.rugplot').attr('class', 'rugplot');
         var rugs = rugPlot.selectAll('rect').data(data);
         rugs.enter().append('rect').attr('class', function (d) {
           return "".concat(d.key);
         }) // .attr('data-value', d => `${d.value}`)
-        .attr('x', function (d) {
-          return xScale(d.value) - rugWidth / 2;
-        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', rugWidth).merge(rugs).transition(transition).attr('x', function (d) {
-          return xScale(d.value) - rugWidth / 2;
-        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', rugWidth);
+        .style('fill', props.rugProps.rugColor).attr('x', function (d) {
+          return xScale(d.value) - props.rugProps.rugWidth / 2;
+        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth).merge(rugs).transition(transition).attr('x', function (d) {
+          return xScale(d.value) - props.rugProps.rugWidth / 2;
+        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth);
         rugs.raise().exit().remove(); // add highlight
 
         if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
@@ -772,10 +793,10 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
           _highlightMarkers.exit().remove();
 
-          d3.select('.highlights').lower(); // highlight the rugs
+          d3.select("#".concat(node.id, " .highlights")).lower(); // highlight the rugs
 
           _markerData.forEach(function (element) {
-            d3.select("rect.".concat(element.key)).classed('highlighted', 'true');
+            d3.select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true');
           });
         }
       } // HISTOGRAM CODE
