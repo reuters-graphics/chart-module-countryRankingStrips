@@ -511,6 +511,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
     key: "draw",
     // defaultData = defaultData;
     value: function draw() {
+      var _this2 = this;
+
       var allData = this.data();
       var props = this.props();
       var node = this.selection().node();
@@ -553,9 +555,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             value: normalize(d[props.dataParams.value])
           };
         });
-      }
+      } // console.log((data));
+      // DEFINE SCALES
 
-      console.log(data); // DEFINE SCALES
 
       var xScale = d3.scaleLinear().domain(d3.extent(dataValues)).nice().range([props.margin.left, width - props.margin.right]);
       var thresholds, bins, yScale;
@@ -647,7 +649,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
           svgDefs.appendSelect('clipPath').attr('id', "".concat(node.id, "-clip-path")).appendSelect('path').transition(transition).attr('d', distributionArea(density)); // add highlight shape
 
           var highlightGroup = chartSVG.appendSelect('g.highlights').attr('class', 'highlights');
-          var highlights = highlightGroup.selectAll('rect').data(markerData);
+          var highlights = highlightGroup.selectAll('rect').data(markerData, function (d) {
+            return d.key;
+          });
           highlights.enter().append('rect').attr('class', function (d) {
             return "".concat(d.key);
           }).attr('data-value', function (d) {
@@ -739,12 +743,14 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
 
           if (props.rugProps.customAxisFormat) {
-            d3.select("#".concat(node.id, " .CountryRankingStrips .axis.axis-x")).classed('customAxisFormat', 'true');
+            this.selection().select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
           }
         }
 
         var rugPlot = plot.appendSelect('g.rugplot').attr('class', 'rugplot');
-        var rugs = rugPlot.selectAll('rect').data(data);
+        var rugs = rugPlot.selectAll('rect').data(data, function (d) {
+          return d.key;
+        });
         rugs.enter().append('rect').attr('class', function (d) {
           return "".concat(d.key);
         }) // .attr('data-value', d => `${d.value}`)
@@ -799,10 +805,10 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
           _highlightMarkers.exit().remove();
 
-          d3.select("#".concat(node.id, " .highlights")).lower(); // highlight the rugs
+          this.selection().select("#".concat(node.id, " .highlights")).lower(); // highlight the rugs
 
           _markerData.forEach(function (element) {
-            d3.select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true').style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
+            _this2.selection().select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true').style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
           });
         }
       } // HISTOGRAM CODE
