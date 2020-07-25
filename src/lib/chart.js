@@ -103,7 +103,7 @@ class CountryRankingStrips extends ChartComponent {
         };
       });
     }
-    console.log((data));
+    // console.log((data));
 
     // DEFINE SCALES
     const xScale = d3.scaleLinear()
@@ -237,7 +237,7 @@ class CountryRankingStrips extends ChartComponent {
         const highlightGroup = chartSVG.appendSelect('g.highlights')
           .attr('class', 'highlights');
         const highlights = highlightGroup.selectAll('rect')
-          .data(markerData);
+          .data(markerData, d => d.key);
 
         highlights.enter().append('rect')
           .attr('class', d => `${d.key}`)
@@ -351,14 +351,14 @@ class CountryRankingStrips extends ChartComponent {
         }
         // custom label format
         if (props.rugProps.customAxisFormat) {
-          d3.select(`#${node.id} .CountryRankingStrips .axis.axis-x`).classed('customAxisFormat', 'true');
+          this.selection().select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
         }
       }
       const rugPlot = plot.appendSelect('g.rugplot')
         .attr('class', 'rugplot');
 
       const rugs = rugPlot.selectAll('rect')
-        .data(data);
+        .data(data, d => d.key);
       rugs.enter().append('rect')
         .attr('class', d => `${d.key}`)
         // .attr('data-value', d => `${d.value}`)
@@ -429,11 +429,11 @@ class CountryRankingStrips extends ChartComponent {
           .attr('transform', d => `translate(${xScale(d.value)}, ${rugPosition.y - markerPos})`);
 
         highlightMarkers.exit().remove();
-        d3.select(`#${node.id} .highlights`).lower();
+        this.selection().select(`#${node.id} .highlights`).lower();
 
         // highlight the rugs
         markerData.forEach(element => {
-          d3.select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true')
+          this.selection().select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true')
             .style('stroke-width', props.rugProps.highlightWidth / 2)
             .style('stroke', props.rugProps.highlightColor)
             .style('fill', props.rugProps.highlightColor)

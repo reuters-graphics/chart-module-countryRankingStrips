@@ -116,15 +116,15 @@ class ChartComponent extends React.Component {
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
-    this.chart1.draw();
-    this.chart2.draw();
+    this.chart1.data(DATA.cases).draw();
+    this.chart2.data(DATA.deaths).draw();
   }, 250);
 
   componentDidMount() {
     // Use our chart module.
     this.chart1
       .selection(this.chart1Container.current)
-      .data(DATA.cases)
+      .data(dataAsia)
       .props({
         chartTitle: 'global cases',
         locale: 'en',
@@ -144,7 +144,7 @@ class ChartComponent extends React.Component {
           height: 16,
           annotation: [
             {
-              key: 'ES',
+              key: 'IN',
               // text: 'Spain',
             },
             // {
@@ -162,7 +162,7 @@ class ChartComponent extends React.Component {
 
     this.chart2
       .selection(this.chart2Container.current)
-      .data(DATA.deaths)
+      .data(dataAsia1)
       .props({
         chartTitle: 'global deaths',
         locale: 'en',
@@ -182,7 +182,7 @@ class ChartComponent extends React.Component {
           height: 16,
           annotation: [
             {
-              key: 'ES',
+              key: 'IN',
               // text: 'Spain',
             },
           ],
