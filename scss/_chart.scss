@@ -17,7 +17,7 @@
   }
   .CountryRankingStrips {
     background-color: $dark-blue;
-    overflow: visible;
+    // overflow: visible;
     path.distribution-area {
       opacity: 1;
       stroke: none;
@@ -42,13 +42,13 @@
     .histogram{
       fill: $area-color;
     }
+    rect.highlight-bar{
+      fill: $area-color;
+      stroke-width: 0;
+      stroke: $text-color;
+      opacity: 0.55;
+    }
     .highlights {
-      rect{
-        fill: $area-color;
-        stroke-width: 0;
-        stroke: $text-color;
-      }
-      .marker-g {
         path {
           stroke: $text-color;
           stroke-width: 1;
@@ -63,7 +63,7 @@
           font-size: 1rem;
           font-weight: bold;
         }
-      }
+      
 
     }
     .axis {

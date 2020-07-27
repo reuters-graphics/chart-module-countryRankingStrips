@@ -330,22 +330,29 @@ class CountryRankingStrips extends ChartComponent {
         y: props.height - props.margin.bottom - props.rugProps.height - 4,
         height: props.rugProps.height,
       };
+      var xScaleRug;
       // add rugplot axis
-      if (!props.histogram || !props.densityPlot) {
+      if (props.histogram || props.densityPlot) {
+        xScaleRug = xScale;
+      } else {
+        xScaleRug = d3.scaleLinear()
+          .domain(d3.extent(dataValues))
+          .range([props.margin.left, width - props.margin.right]);
         const rugXAxis = chartSVG.appendSelect('g.axis-x')
           .attr('class', 'axis axis-x')
           .transition(transition)
           .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
+
         if (props.rugProps.customAxisLabels) {
           rugXAxis.call(
-            d3.axisBottom(xScale)
-              .tickValues(xScale.domain())
+            d3.axisBottom(xScaleRug)
+              .tickValues(xScaleRug.domain())
               .tickFormat((d, i) => props.rugProps.customAxisLabels[i])
           );
         } else {
           rugXAxis.call(
-            d3.axisBottom(xScale)
-              .tickValues(xScale.domain())
+            d3.axisBottom(xScaleRug)
+              .tickValues(xScaleRug.domain())
               .tickFormat(numFormat)
           );
         }
@@ -363,13 +370,13 @@ class CountryRankingStrips extends ChartComponent {
         .attr('class', d => `${d.key}`)
         // .attr('data-value', d => `${d.value}`)
         .style('fill', props.rugProps.rugColor)
-        .attr('x', d => xScale(d.value) - props.rugProps.rugWidth / 2)
+        .attr('x', d => xScaleRug(d.value) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
         .attr('width', props.rugProps.rugWidth)
         .merge(rugs)
         .transition(transition)
-        .attr('x', d => xScale(d.value) - props.rugProps.rugWidth / 2)
+        .attr('x', d => xScaleRug(d.value) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
         .attr('width', props.rugProps.rugWidth);
@@ -379,19 +386,6 @@ class CountryRankingStrips extends ChartComponent {
       // add highlight
 
       if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
-        const highlightGroup = chartSVG.appendSelect('g.highlights')
-          .attr('class', 'highlights');
-
-        highlightGroup.appendSelect('rect.highlight-bar')
-          .attr('class', 'highlight-bar')
-          .style('opacity', 0.55)
-          .attr('x', xScale.range()[0])
-          .attr('y', rugPosition.y)
-          .attr('height', rugPosition.height)
-          .attr('width', xScale.range()[1] - xScale.range()[0])
-          .transition(transition)
-          .attr('width', xScale.range()[1] - xScale.range()[0]);
-
         const markerData = props.rugProps.annotation.map(element => {
           const val = element[props.dataParams.value] ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
 
@@ -402,14 +396,50 @@ class CountryRankingStrips extends ChartComponent {
             // text: element.text || element[props.dataParams.key],
           };
         });
+
+        const annoPos = (text, val) => {
+          let textPos = 0;
+          let textAnchor = 'middle';
+          const textLen = text.length * 3;
+          if (textLen) {
+            if (xScaleRug(val) + textLen >= xScaleRug.range()[1]) {
+              textPos = 6;
+              textAnchor = 'end';
+            }
+            if (xScaleRug(val) - textLen <= xScaleRug.range()[0]) {
+              textPos = -6;
+              textAnchor = 'start';
+            }
+          }
+          return {
+            xPos: textPos,
+            xAnchor: textAnchor,
+
+          };
+        };
+
         const markerPos = Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) + 4;
         const markerSymbol = d3.symbol().type(d3.symbolTriangle).size(rugPosition.height * 3);
+
+        const highlightGroup = chartSVG.appendSelect('g.highlights')
+          .attr('class', 'highlights');
+
+        highlightGroup.appendSelect('rect.highlight-bar')
+          .attr('class', 'highlight-bar')
+          // .style('opacity', 0.55)
+          .attr('x', xScaleRug.range()[0])
+          .attr('y', rugPosition.y)
+          .attr('height', rugPosition.height)
+          .attr('width', xScaleRug.range()[1] - xScaleRug.range()[0])
+          .transition(transition)
+          .attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
+
         const highlightMarkers = highlightGroup.selectAll('g.marker-g')
           .data(markerData, d => d.key);
 
         const markerG = highlightMarkers.enter().append('g')
           .attr('class', d => `marker-g ${d.key}`)
-          .attr('transform', d => `translate(${xScale(d.value)}, ${rugPosition.y - markerPos})`);
+          .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos})`);
 
         markerG.append('path')
           .attr('class', d => `marker-rug ${d.key}`)
@@ -417,23 +447,47 @@ class CountryRankingStrips extends ChartComponent {
           .attr('fill', 'none')
           .attr('d', markerSymbol);
 
-        markerG.append('text')
-          .attr('transform', `translate(0, ${-markerPos - 2})`)
-          .attr('text-anchor', 'middle')
-          .append('tspan')
-          .text(d => `${d.text}`);
-
         highlightMarkers
           .merge(highlightMarkers)
           .transition(transition)
-          .attr('transform', d => `translate(${xScale(d.value)}, ${rugPosition.y - markerPos})`);
+          .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos})`);
 
         highlightMarkers.exit().remove();
-        this.selection().select(`#${node.id} .highlights`).lower();
+
+        const markerText = highlightGroup.selectAll('text.marker-text')
+          .data(markerData, d => d.key);
+
+        markerText.enter().append('text')
+          .attr('transform', d => `translate(${xScaleRug(d.value) + annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
+          .attr('class', d => `marker-text ${d.key}`)
+          .text(d => `${d.text}`)
+          .attr('text-anchor', d => {
+            console.log(annoPos(d.text, d.value).xAnchor);
+            return annoPos(d.text, d.value).xAnchor;
+          })
+          .merge(markerText)
+          .transition(transition)
+          .attr('transform', d => `translate(${xScaleRug(d.value) + annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
+          .attr('class', d => `marker-text ${d.key}`)
+          .text(d => `${d.text}`)
+          .attr('text-anchor', d => {
+            console.log(annoPos(d.text, d.value).xAnchor);
+            return annoPos(d.text, d.value).xAnchor;
+          });
+
+        markerText.exit().remove();
+
+        this.selection().select('.highlights').lower();
 
         // highlight the rugs
+        // deselect old rugs
+        this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false)
+          .style('stroke-width', props.rugProps.rugWidth)
+          .style('stroke', 'none')
+          .style('fill', props.rugProps.rugColor);
+        // highlight new data
         markerData.forEach(element => {
-          this.selection().select(`#${node.id} .CountryRankingStrips rect.${element.key}`).classed('highlighted', 'true')
+          this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
             .style('stroke-width', props.rugProps.highlightWidth / 2)
             .style('stroke', props.rugProps.highlightColor)
             .style('fill', props.rugProps.highlightColor)

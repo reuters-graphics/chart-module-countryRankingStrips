@@ -66,20 +66,20 @@ const pop = popData.metadata.map(d => {
   };
 });
 
-DATA.cases = DATA.cases.map(e => {
-  // console.log(pop.find(d => d.key === e.key).population);
-  return {
-    key: e.key,
-    value: e.value * 100000 / pop.find(d => d.key === e.key).population,
-  };
-});
-DATA.deaths = DATA.deaths.map(e => {
-  // console.log(pop.find(d => d.key === e.key).population);
-  return {
-    key: e.key,
-    value: e.value * 100000 / pop.find(d => d.key === e.key).population,
-  };
-});
+// DATA.cases = DATA.cases.map(e => {
+//   // console.log(pop.find(d => d.key === e.key).population);
+//   return {
+//     key: e.key,
+//     value: e.value * 100000 / pop.find(d => d.key === e.key).population,
+//   };
+// });
+// DATA.deaths = DATA.deaths.map(e => {
+//   // console.log(pop.find(d => d.key === e.key).population);
+//   return {
+//     key: e.key,
+//     value: e.value * 100000 / pop.find(d => d.key === e.key).population,
+//   };
+// });
 
 // cases
 const dataEurope = DATA.cases.filter(d => _getCountryList('Europe').includes(d.key));
@@ -116,8 +116,26 @@ class ChartComponent extends React.Component {
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
-    this.chart1.data(DATA.cases).draw();
-    this.chart2.data(DATA.deaths).draw();
+    this.chart1.data(DATA.cases).props({
+      rugProps: {
+        height: 16,
+        annotation: [
+          {
+            key: 'IN',
+            text: 'indioaaaaaa',
+          },
+          // {
+          //   key: 'ME',
+          //   text: 'ME',
+          // },
+          // {
+          //   key: 'US',
+          //   // text: 'ME',
+          // },
+        ],
+      },
+    }).draw();
+    this.chart2.data(dataAsia1).draw();
   }, 250);
 
   componentDidMount() {
@@ -132,7 +150,7 @@ class ChartComponent extends React.Component {
           key: 'key',
           value: 'value',
         },
-        height: 50,
+        height: 150,
         margin: {
           top: 18,
           right: 18,
@@ -145,16 +163,12 @@ class ChartComponent extends React.Component {
           annotation: [
             {
               key: 'IN',
-              // text: 'Spain',
+              text: 'India',
             },
-            // {
-            //   key: 'ME',
-            //   text: 'ME',
-            // },
-            // {
-            //   key: 'US',
-            //   // text: 'ME',
-            // },
+            {
+              key: 'BD',
+              text: 'BDbdbdbdbdbdb',
+            },
           ],
         },
       })
@@ -162,7 +176,7 @@ class ChartComponent extends React.Component {
 
     this.chart2
       .selection(this.chart2Container.current)
-      .data(dataAsia1)
+      .data(DATA.deaths)
       .props({
         chartTitle: 'global deaths',
         locale: 'en',
@@ -170,7 +184,7 @@ class ChartComponent extends React.Component {
           key: 'key',
           value: 'value',
         },
-        height: 50,
+        height: 150,
         margin: {
           top: 18,
           right: 18,
@@ -183,7 +197,7 @@ class ChartComponent extends React.Component {
           annotation: [
             {
               key: 'IN',
-              // text: 'Spain',
+              text: 'India',
             },
           ],
         },
