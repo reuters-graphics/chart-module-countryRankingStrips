@@ -25,18 +25,18 @@ DATA.deaths = Object.keys(covidData.latestTotals.deaths).map(element => {
   };
 });
 
-// DATA.cases = Object.keys(covidData.latestWeeklyAvgs.cases).map(element => {
-//   return {
-//     key: element,
-//     value: covidData.latestWeeklyAvgs.cases[element].slice(-1)[0],
-//   };
-// });
-// DATA.deaths = Object.keys(covidData.latestWeeklyAvgs.deaths).map(element => {
-//   return {
-//     key: element,
-//     value: covidData.latestWeeklyAvgs.deaths[element].slice(-1)[0],
-//   };
-// });
+DATA.casesPct = Object.keys(covidData.latestWeeklyAvgs.cases).map(element => {
+  return {
+    key: element,
+    value: 100 * (covidData.latestWeeklyAvgs.cases[element].slice(-1)[0] - covidData.latestWeeklyAvgs.cases[element].slice(-2)[0]),
+  };
+});
+DATA.deathsPct = Object.keys(covidData.latestWeeklyAvgs.deaths).map(element => {
+  return {
+    key: element,
+    value: 100 * (covidData.latestWeeklyAvgs.deaths[element].slice(-1)[0] - covidData.latestWeeklyAvgs.deaths[element].slice(-2)[0]),
+  };
+});
 
 // DATA.cases = Object.keys(covidData.latestCounts.cases).map(element => {
 //   return {
@@ -116,14 +116,15 @@ class ChartComponent extends React.Component {
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
-    this.chart1.data(DATA.cases).props({
+    this.chart1.data(DATA.casesPct).props({
       rugProps: {
         height: 16,
+        // highlightColor: '#ee665b',
         annotation: [
-          {
-            key: 'IN',
-            text: 'indioaaaaaa',
-          },
+          // {
+          //   key: 'SD',
+          //   text: 'SD',
+          // },
           // {
           //   key: 'ME',
           //   text: 'ME',
@@ -135,7 +136,7 @@ class ChartComponent extends React.Component {
         ],
       },
     }).draw();
-    this.chart2.data(dataAsia1).draw();
+    this.chart2.data(DATA.deathsPct).draw();
   }, 250);
 
   componentDidMount() {
@@ -165,10 +166,9 @@ class ChartComponent extends React.Component {
               key: 'IN',
               text: 'India',
             },
-            {
-              key: 'BD',
-              text: 'BDbdbdbdbdbdb',
-            },
+            // {
+            //   value: 0,
+            //
           ],
         },
       })
@@ -176,7 +176,7 @@ class ChartComponent extends React.Component {
 
     this.chart2
       .selection(this.chart2Container.current)
-      .data(DATA.deaths)
+      .data(dataAsia1)
       .props({
         chartTitle: 'global deaths',
         locale: 'en',
