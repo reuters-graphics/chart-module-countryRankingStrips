@@ -623,7 +623,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         if (props.markDataPoint) {
           // set data point
           var markerData = props.markDataPoint.map(function (element) {
-            var val = element[props.dataParams.value] ? normalize(element[props.dataParams.value]) : normalize(allData.find(function (e) {
+            var val = element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value]) ? normalize(element[props.dataParams.value]) : normalize(allData.find(function (e) {
               return e[props.dataParams.key] === element[props.dataParams.key];
             })[props.dataParams.value]);
             var posDist = 0;
@@ -633,7 +633,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             });
             var densityScale = d3.scaleLinear().domain([posBin.x0, posBin.x1]).range([density[posDist][1], density[posDist + 1][1]]);
             return {
-              key: element[props.dataParams.key],
+              key: element[props.dataParams.key] || "value".concat(val),
               value: val,
               text: element.text,
               densityIndex: posDist,
@@ -728,17 +728,22 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         var rugPosition = {
           y: props.height - props.margin.bottom - props.rugProps.height - 4,
           height: props.rugProps.height
-        }; // add rugplot axis
+        };
+        var xScaleRug; // add rugplot axis
 
-        if (!props.histogram || !props.densityPlot) {
+        if (props.histogram || props.densityPlot) {
+          xScaleRug = xScale;
+        } else {
+          xScaleRug = d3.scaleLinear().domain(d3.extent(dataValues)) // .domain([-d3.extent(dataValues)[1], d3.extent(dataValues)[1]])
+          .range([props.margin.left, width - props.margin.right]);
           var rugXAxis = chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
 
           if (props.rugProps.customAxisLabels) {
-            rugXAxis.call(d3.axisBottom(xScale).tickValues(xScale.domain()).tickFormat(function (d, i) {
+            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(xScaleRug.domain()).tickFormat(function (d, i) {
               return props.rugProps.customAxisLabels[i];
             }));
           } else {
-            rugXAxis.call(d3.axisBottom(xScale).tickValues(xScale.domain()).tickFormat(numFormat));
+            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(xScaleRug.domain()).tickFormat(numFormat));
           } // custom label format
 
 
@@ -752,34 +757,63 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
           return d.key;
         });
         rugs.enter().append('rect').attr('class', function (d) {
-          return "".concat(d.key);
-        }) // .attr('data-value', d => `${d.value}`)
-        .style('fill', props.rugProps.rugColor).attr('x', function (d) {
-          return xScale(d.value) - props.rugProps.rugWidth / 2;
+          return "".concat(d[props.dataParams.key]);
+        }).attr('data-value', function (d) {
+          return "".concat(d[props.dataParams.value]);
+        }).style('fill', props.rugProps.rugColor) // .style('fill', d => d[props.dataParams.value] < 0 ? '#ee665b' : '#74c476')
+        .attr('x', function (d) {
+          return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth).merge(rugs).transition(transition).attr('x', function (d) {
-          return xScale(d.value) - props.rugProps.rugWidth / 2;
+          return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth);
         rugs.raise().exit().remove(); // add highlight
 
         if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
-          var _highlightGroup = chartSVG.appendSelect('g.highlights').attr('class', 'highlights');
-
-          _highlightGroup.appendSelect('rect.highlight-bar').attr('class', 'highlight-bar').style('opacity', 0.55).attr('x', xScale.range()[0]).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', xScale.range()[1] - xScale.range()[0]).transition(transition).attr('width', xScale.range()[1] - xScale.range()[0]);
-
           var _markerData = props.rugProps.annotation.map(function (element) {
-            var val = element[props.dataParams.value] ? element[props.dataParams.value] : data.find(function (e) {
+            // console.log(element);
+            var val = element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value]) ? element[props.dataParams.value] : data.find(function (e) {
               return e[props.dataParams.key] === element[props.dataParams.key];
-            })[props.dataParams.value];
+            })[props.dataParams.value]; // const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
+
             return {
-              key: element[props.dataParams.key],
+              key: element[props.dataParams.key] || "value".concat(val),
               value: val,
               text: element.text || '' // text: element.text || element[props.dataParams.key],
 
             };
-          });
+          }); // console.log(markerData);
+
+
+          var annoPos = function annoPos(text, val) {
+            var textPos = 0;
+            var textAnchor = 'middle';
+            var textLen = text.length * 3;
+
+            if (textLen) {
+              if (xScaleRug(val) + textLen >= xScaleRug.range()[1]) {
+                textPos = 6;
+                textAnchor = 'end';
+              }
+
+              if (xScaleRug(val) - textLen <= xScaleRug.range()[0]) {
+                textPos = -6;
+                textAnchor = 'start';
+              }
+            }
+
+            return {
+              xPos: textPos,
+              xAnchor: textAnchor
+            };
+          };
 
           var markerPos = Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) + 4;
           var markerSymbol = d3.symbol().type(d3.symbolTriangle).size(rugPosition.height * 3);
+
+          var _highlightGroup = chartSVG.appendSelect('g.highlights').attr('class', 'highlights');
+
+          _highlightGroup.appendSelect('rect.highlight-bar').attr('class', 'highlight-bar') // .style('opacity', 0.55)
+          .attr('x', xScaleRug.range()[0]).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]).transition(transition).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
 
           var _highlightMarkers = _highlightGroup.selectAll('g.marker-g').data(_markerData, function (d) {
             return d.key;
@@ -788,27 +822,46 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
           var _markerG = _highlightMarkers.enter().append('g').attr('class', function (d) {
             return "marker-g ".concat(d.key);
           }).attr('transform', function (d) {
-            return "translate(".concat(xScale(d.value), ", ").concat(rugPosition.y - markerPos, ")");
+            return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ")");
           });
 
           _markerG.append('path').attr('class', function (d) {
             return "marker-rug ".concat(d.key);
           }).style('transform', 'rotate(180deg)').attr('fill', 'none').attr('d', markerSymbol);
 
-          _markerG.append('text').attr('transform', "translate(0, ".concat(-markerPos - 2, ")")).attr('text-anchor', 'middle').append('tspan').text(function (d) {
-            return "".concat(d.text);
-          });
-
           _highlightMarkers.merge(_highlightMarkers).transition(transition).attr('transform', function (d) {
-            return "translate(".concat(xScale(d.value), ", ").concat(rugPosition.y - markerPos, ")");
+            return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ")");
           });
 
           _highlightMarkers.exit().remove();
 
-          this.selection().select("#".concat(node.id, " .highlights")).lower(); // highlight the rugs
+          var markerText = _highlightGroup.selectAll('text.marker-text').data(_markerData, function (d) {
+            return d.key;
+          });
+
+          markerText.enter().append('text').attr('transform', function (d) {
+            return "translate(".concat(xScaleRug(d.value) + annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+          }).attr('class', function (d) {
+            return "marker-text ".concat(d.key);
+          }).text(function (d) {
+            return "".concat(d.text);
+          }).attr('text-anchor', function (d) {
+            return annoPos(d.text, d.value).xAnchor;
+          }).merge(markerText).transition(transition).attr('transform', function (d) {
+            return "translate(".concat(xScaleRug(d.value) + annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+          }).text(function (d) {
+            return "".concat(d.text);
+          }).attr('text-anchor', function (d) {
+            return annoPos(d.text, d.value).xAnchor;
+          });
+          markerText.exit().remove();
+          this.selection().select('.highlights').lower(); // highlight the rugs
+          // deselect old rugs
+
+          this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false).style('stroke-width', props.rugProps.rugWidth).style('stroke', 'none').style('fill', props.rugProps.rugColor); // highlight new data
 
           _markerData.forEach(function (element) {
-            _this2.selection().select("#".concat(node.id, " .CountryRankingStrips rect.").concat(element.key)).classed('highlighted', 'true').style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
+            _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).classed('highlighted', true).style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
           });
         }
       } // HISTOGRAM CODE

@@ -389,7 +389,7 @@ class CountryRankingStrips extends ChartComponent {
 
       if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
         const markerData = props.rugProps.annotation.map(element => {
-          console.log(element);
+          // console.log(element);
           const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
           // const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
 
@@ -401,7 +401,7 @@ class CountryRankingStrips extends ChartComponent {
           };
         });
 
-        console.log(markerData);
+        // console.log(markerData);
         const annoPos = (text, val) => {
           let textPos = 0;
           let textAnchor = 'middle';
