@@ -119,6 +119,8 @@ class ChartComponent extends React.Component {
     this.chart1.data(DATA.casesPct).props({
       rugProps: {
         height: 16,
+        tooltipData: DATA.casesPct,
+        // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
         annotation: [
           // {
@@ -136,7 +138,27 @@ class ChartComponent extends React.Component {
         ],
       },
     }).draw();
-    this.chart2.data(DATA.deathsPct).draw();
+    this.chart2.props({
+      rugProps: {
+        height: 16,
+        // getTooltipText: (key) => key,
+        // highlightColor: '#ee665b',
+        annotation: [
+          // {
+          //   key: 'SD',
+          //   text: 'SD',
+          // },
+          // {
+          //   key: 'ME',
+          //   text: 'ME',
+          // },
+          // {
+          //   key: 'US',
+          //   // text: 'ME',
+          // },
+        ],
+      },
+    }).data(DATA.deathsPct).draw();
   }, 250);
 
   componentDidMount() {
@@ -161,10 +183,11 @@ class ChartComponent extends React.Component {
         rugPlot: true,
         rugProps: {
           height: 16,
+          getTooltipText: (key) => `${key}works!`,
           annotation: [
             {
               key: 'IN',
-              text: 'India',
+              // text: 'India',
             },
             // {
             //   value: 0,
@@ -194,6 +217,7 @@ class ChartComponent extends React.Component {
         rugPlot: true,
         rugProps: {
           height: 16,
+          getTooltipText: (key) => `${key}works!`,
           annotation: [
             {
               key: 'IN',

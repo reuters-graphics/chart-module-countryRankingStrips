@@ -1,6 +1,7 @@
 import ChartComponent from './base/ChartComponent';
 import d3 from './utils/d3';
 import D3Locale from '@reuters-graphics/d3-locale';
+import throttle from 'lodash/throttle';
 
 class CountryRankingStrips extends ChartComponent {
   defaultProps = {
@@ -38,6 +39,7 @@ class CountryRankingStrips extends ChartComponent {
       rugColor: 'rgba(255, 255, 255, 0.75)',
       highlightWidth: 2,
       highlightColor: '#eec331',
+      getTooltipText: (key) => key,
       // annotation: [
       //   {
       //     key: 'ES',
@@ -383,7 +385,7 @@ class CountryRankingStrips extends ChartComponent {
         .attr('height', rugPosition.height)
         .attr('width', props.rugProps.rugWidth);
 
-      rugs.raise().exit().remove();
+      rugs.exit().remove();
 
       // add highlight
 
@@ -391,18 +393,24 @@ class CountryRankingStrips extends ChartComponent {
         const markerData = props.rugProps.annotation.map(element => {
           // console.log(element);
           const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
-          // const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
 
           return {
             key: element[props.dataParams.key] || `value${val}`,
             value: val,
-            text: element.text || '',
+            text: element.text || props.rugProps.getTooltipText(element[props.dataParams.key]),
             // text: element.text || element[props.dataParams.key],
+          };
+        });
+        const tooltipData = data.map(element => {
+          return {
+            key: element[props.dataParams.key],
+            value: element[props.dataParams.value],
+            text: props.rugProps.getTooltipText(element[props.dataParams.key]),
           };
         });
 
         // console.log(markerData);
-        const annoPos = (text, val) => {
+        const _annoPos = (text, val) => {
           let textPos = 0;
           let textAnchor = 'middle';
           const textLen = text.length * 3;
@@ -429,67 +437,107 @@ class CountryRankingStrips extends ChartComponent {
         const highlightGroup = chartSVG.appendSelect('g.highlights')
           .attr('class', 'highlights');
 
-        highlightGroup.appendSelect('rect.highlight-bar')
+        const rugBgBar = highlightGroup.appendSelect('rect.highlight-bar')
           .attr('class', 'highlight-bar')
           // .style('opacity', 0.55)
           .attr('x', xScaleRug.range()[0])
           .attr('y', rugPosition.y)
           .attr('height', rugPosition.height)
-          .attr('width', xScaleRug.range()[1] - xScaleRug.range()[0])
-          .transition(transition)
           .attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
 
-        const highlightMarkers = highlightGroup.selectAll('g.marker-g')
-          .data(markerData, d => d.key);
+        const _drawTooltips = (data) => {
+          const marker = highlightGroup.selectAll('path.marker-rug')
+            .data(data, d => d.key);
 
-        const markerG = highlightMarkers.enter().append('g')
-          .attr('class', d => `marker-g ${d.key}`)
-          .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos})`);
+          marker.enter().append('path')
+            .attr('class', d => `marker-rug ${d.key}`)
+            .attr('fill', 'none')
+            .attr('d', markerSymbol)
+            .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos}) rotate(180)`)
+            .merge(marker)
+            .interrupt()
+            .transition(transition)
+            .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos}) rotate(180)`);
+          marker.exit().remove();
 
-        markerG.append('path')
-          .attr('class', d => `marker-rug ${d.key}`)
-          .style('transform', 'rotate(180deg)')
-          .attr('fill', 'none')
-          .attr('d', markerSymbol);
+          const markerText = highlightGroup.selectAll('text.marker-text')
+            .data(data, d => d.key);
 
-        highlightMarkers
-          .merge(highlightMarkers)
-          .transition(transition)
-          .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos})`);
+          markerText.enter().append('text')
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
+            .attr('class', d => `marker-text ${d.key}`)
+            .text(d => `${d.text}`)
+            .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor)
+            .merge(markerText)
+            .interrupt()
+            .transition(transition)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
+            .text(d => `${d.text}`)
+            .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);
 
-        highlightMarkers.exit().remove();
+          markerText.exit().remove();
+        };
 
-        const markerText = highlightGroup.selectAll('text.marker-text')
-          .data(markerData, d => d.key);
+        // this.selection().select('.highlights').lower();
 
-        markerText.enter().append('text')
-          .attr('transform', d => `translate(${xScaleRug(d.value) + annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
-          .attr('class', d => `marker-text ${d.key}`)
-          .text(d => `${d.text}`)
-          .attr('text-anchor', d => annoPos(d.text, d.value).xAnchor)
-          .merge(markerText)
-          .transition(transition)
-          .attr('transform', d => `translate(${xScaleRug(d.value) + annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
-          .text(d => `${d.text}`)
-          .attr('text-anchor', d => annoPos(d.text, d.value).xAnchor);
+        // TOOLTIP AND HIGHLIGHTS
+        const _setDefaultTooltip = () => {
+          // draw highlight label
+          _drawTooltips(markerData);
 
-        markerText.exit().remove();
+          // deselect old rugs
+          this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false)
+            .style('stroke-width', props.rugProps.rugWidth)
+            .style('stroke', 'none')
+            .style('fill', props.rugProps.rugColor);
+          // highlight new data
+          markerData.forEach(element => {
+            this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', false);
+            this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', false);
 
-        this.selection().select('.highlights').lower();
+            this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', true);
+            this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', true);
+
+            this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
+              .style('stroke-width', props.rugProps.highlightWidth / 2)
+              .style('stroke', props.rugProps.highlightColor)
+              .style('fill', props.rugProps.highlightColor)
+              .raise();
+          });
+        };
+
+        const _getActiveTooltip = (pos) => {
+          const mouseVal = xScaleRug.invert(pos);
+          const lookup = tooltipData.filter(d => markerData.find(e => e.key !== d.key));
+          return lookup.reduce((prev, curr) => {
+            return (Math.abs(curr.value - mouseVal) < Math.abs(prev.value - mouseVal) ? curr : prev);
+          });
+        };
+        const _setActiveTooltip = (el) => {
+          // draw hover label
+          _drawTooltips((el instanceof Array) ? el : [el]);
+
+          this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
+          this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
+
+          // hide the highlighted labels
+          markerData.forEach(element => {
+            this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', false);
+            this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', false);
+          });
+        };
 
         // highlight the rugs
-        // deselect old rugs
-        this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false)
-          .style('stroke-width', props.rugProps.rugWidth)
-          .style('stroke', 'none')
-          .style('fill', props.rugProps.rugColor);
-        // highlight new data
-        markerData.forEach(element => {
-          this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
-            .style('stroke-width', props.rugProps.highlightWidth / 2)
-            .style('stroke', props.rugProps.highlightColor)
-            .style('fill', props.rugProps.highlightColor)
-            .raise();
+        _setDefaultTooltip();
+
+        // this.selection().select('.CountryRankingStrips .highlights rect.highlight-bar')
+        rugBgBar.on('mouseenter mousemove', throttle(() => {
+          if (!d3.event) return;
+          _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0]));
+        }, 50));
+
+        rugBgBar.on('mouseleave', () => {
+          _setDefaultTooltip();
         });
       }
     }

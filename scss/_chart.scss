@@ -47,6 +47,7 @@
       stroke-width: 0;
       stroke: $text-color;
       opacity: 0.55;
+      cursor: pointer;
     }
     .highlights {
         path {
@@ -54,14 +55,33 @@
           stroke-width: 1;
         }
         path.marker-rug {
-          fill: $dark-yellow;
+          fill: $text-color;
           stroke: none;
-          // transform: rotate(180deg);
+          display: none;
+
+          &.active {
+            display: block;
+          }
+
+          &.highlighted {
+            fill: $dark-yellow;
+          }
         }
         text {
-          fill: $dark-yellow;
+          fill: $text-color;
           font-size: 1rem;
-          font-weight: bold;
+          // font-weight: bold;
+          display: none;
+
+          &.active {
+            display: block;
+          }
+
+          &.highlighted {
+            fill: $dark-yellow;
+            font-size: 1rem;
+            font-weight: bold;
+          }
         }
       
 
