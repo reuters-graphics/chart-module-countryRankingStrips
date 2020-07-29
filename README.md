@@ -35,16 +35,14 @@ myChart
         },
         height: 50,
         margin: {
-          top: 18,
-          right: 18,
-          bottom: 20,
-          left: 4,
+          top: 4,
+          right: 8,
+          bottom: 36,
+          left: 8,
         },
         rugPlot: true,
         rugProps: {
           height: 16,
-          customAxisLabels: ['left-label', 'right-label'],
-          customAxisFormat: true,
           rugWidth: 1,
           rugColor: 'rgba(255, 255, 255, 0.75)',
           highlightWidth: 2,
@@ -56,6 +54,15 @@ myChart
             },
             ...
           ],
+          customAxisLabels: [{ pos: 0, label: 'left-label' }, { pos: 100, label: 'right-label' }],
+          customAxisFormat: true,
+          showSplitAxis: true,
+          splitAxis: {
+            value: 0,
+            colors: ['#74c476', '#ee665b'],
+          },
+          getTooltipText: (key) => key,
+          tooltipNumberFormatter: (num) => num,
         },
     })
   .draw();
@@ -138,8 +145,6 @@ Customise the plot height and add labels
 ```javascript
 rugProps: {
   height: 16,
-  customAxisLabels : ['left-label','right-label'], // Override default min-max number labels
-  customAxisFormat: true, // show labels without ticks
   rugWidth: 1,
   rugColor: 'rgba(255, 255, 255, 0.75)',
   highlightWidth: 2, // adds half of this value as stroke
@@ -154,6 +159,16 @@ rugProps: {
       text: 'Lorem Ipsum IN',
     },
   ],
+  // Override default min-max number labels
+  customAxisLabels: [{ pos: 0, label: 'left-label' }, { pos: 100, label: 'right-label' }],
+  customAxisFormat: true, // show labels without ticks
+  showSplitAxis: true, // for data that might have a central pivot
+  splitAxis: {
+    value: 0, // value to split the axis at
+    colors: ['#74c476', '#ee665b'],
+  },
+  getTooltipText: (key) => key, // function to fetch text to be shown on the tooltips
+  tooltipNumberFormatter: (num) => num, // number formatter based on number type and locale
 }
 ```
 
