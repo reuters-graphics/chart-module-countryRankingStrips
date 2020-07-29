@@ -5,6 +5,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var d3 = require('d3');
 var merge = _interopDefault(require('lodash/merge'));
 var D3Locale = _interopDefault(require('@reuters-graphics/d3-locale'));
+var throttle = _interopDefault(require('lodash/throttle'));
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -457,10 +458,10 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       },
       height: 100,
       margin: {
-        top: 18,
-        right: 18,
-        bottom: 20,
-        left: 4
+        top: 4,
+        right: 8,
+        bottom: 36,
+        left: 8
       },
       densityPlot: false,
       histogram: false,
@@ -479,12 +480,21 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       rugPlot: true,
       rugProps: {
         height: 16,
-        customAxisLabels: ['left-label', 'right-label'],
-        customAxisFormat: true,
         rugWidth: 1,
         rugColor: 'rgba(255, 255, 255, 0.75)',
         highlightWidth: 2,
-        highlightColor: '#eec331' // annotation: [
+        highlightColor: '#eec331',
+        getTooltipText: function getTooltipText(key) {
+          return key;
+        },
+        // tooltipNumberFormatter: (num) => num,
+        customAxisLabels: [],
+        customAxisFormat: false,
+        showSplitAxis: false,
+        splitAxis: {
+          value: 0,
+          colors: ['#74c476', '#ee665b']
+        } // annotation: [
         //   {
         //     key: 'ES',
         //     text: 'Spain',
@@ -523,7 +533,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       var transition = d3.transition().duration(750); // number formatters
 
       var locale = new D3Locale(props.locale);
-      var numFormat = locale.format(','); // ADD CHART TITLE
+      var numFormat = locale.format(',');
+      var num2unitwords = locale.format('.3~s');
+      var tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || num2unitwords; // ADD CHART TITLE
 
       if (props.chartTitle) {
         this.selection().appendSelect('div.chart-title').attr('class', 'font-display chart-title').html("<h6>".concat(props.chartTitle, "</h6>"));
@@ -739,17 +751,37 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
           var rugXAxis = chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
 
           if (props.rugProps.customAxisLabels) {
-            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(xScaleRug.domain()).tickFormat(function (d, i) {
-              return props.rugProps.customAxisLabels[i];
-            }));
+            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(props.rugProps.customAxisLabels.map(function (d) {
+              return d.pos;
+            })).tickFormat(function (d, i) {
+              return props.rugProps.customAxisLabels[i].label;
+            }).tickSize(20));
           } else {
-            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(xScaleRug.domain()).tickFormat(numFormat));
+            rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(xScaleRug.domain()).tickFormat(numFormat).tickSize(20));
           } // custom label format
 
 
           if (props.rugProps.customAxisFormat) {
             this.selection().select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
           }
+        } // custom split axis
+
+
+        var splitAxisHeight = 0;
+        var splitAxis = chartSVG.appendSelect('g.split-axis').attr('class', 'split-axis').attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
+
+        if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
+          splitAxisHeight = 2; // left
+
+          splitAxis.appendSelect('rect.axis-left').attr('class', 'axis-left').style('fill', props.rugProps.splitAxis.colors[0]).style('stroke', props.rugProps.splitAxis.colors[0]).style('stroke-width', 1).attr('x', xScaleRug.range()[0]).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - 1); // right
+
+          splitAxis.appendSelect('rect.axis-right').attr('class', 'axis-right').style('fill', props.rugProps.splitAxis.colors[1]).style('stroke', props.rugProps.splitAxis.colors[1]).style('stroke-width', 1).attr('x', xScaleRug(props.rugProps.splitAxis.value) + 1).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value)); // add css colors to the axis labels
+
+          chartSVG.select('g.axis').classed('split-axis', true); // chartSVG.select('g.axis.customAxisFormat g.tick:first-of-type text').style('fill', props.rugProps.splitAxis.colors[0]);
+          // chartSVG.select('g.axis.customAxisFormat g.tick:last-of-type text').style('fill', props.rugProps.splitAxis.colors[1]);
+        } else {
+          splitAxis.remove();
+          chartSVG.select('g.axis').classed('split-axis', false);
         }
 
         var rugPlot = plot.appendSelect('g.rugplot').attr('class', 'rugplot');
@@ -766,25 +798,31 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth).merge(rugs).transition(transition).attr('x', function (d) {
           return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth);
-        rugs.raise().exit().remove(); // add highlight
+        rugs.exit().remove(); // add highlight
 
         if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
           var _markerData = props.rugProps.annotation.map(function (element) {
             // console.log(element);
             var val = element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value]) ? element[props.dataParams.value] : data.find(function (e) {
               return e[props.dataParams.key] === element[props.dataParams.key];
-            })[props.dataParams.value]; // const val = (element[props.dataParams.value] !== null && !isNaN(element[props.dataParams.value])) ? (element[props.dataParams.value]) : (data.find(e => e[props.dataParams.key] === element[props.dataParams.key])[props.dataParams.value]);
-
+            })[props.dataParams.value];
             return {
               key: element[props.dataParams.key] || "value".concat(val),
               value: val,
-              text: element.text || '' // text: element.text || element[props.dataParams.key],
+              text: element.text || props.rugProps.getTooltipText(element[props.dataParams.key]) // text: element.text || element[props.dataParams.key],
 
+            };
+          });
+
+          var tooltipData = data.map(function (element) {
+            return {
+              key: element[props.dataParams.key],
+              value: element[props.dataParams.value],
+              text: props.rugProps.getTooltipText(element[props.dataParams.key])
             };
           }); // console.log(markerData);
 
-
-          var annoPos = function annoPos(text, val) {
+          var _annoPos = function _annoPos(text, val) {
             var textPos = 0;
             var textAnchor = 'middle';
             var textLen = text.length * 3;
@@ -812,56 +850,132 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
           var _highlightGroup = chartSVG.appendSelect('g.highlights').attr('class', 'highlights');
 
-          _highlightGroup.appendSelect('rect.highlight-bar').attr('class', 'highlight-bar') // .style('opacity', 0.55)
-          .attr('x', xScaleRug.range()[0]).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]).transition(transition).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
+          var rugBgBar = _highlightGroup.appendSelect('rect.highlight-bar').attr('class', 'highlight-bar') // .style('opacity', 0.55)
+          .attr('x', xScaleRug.range()[0]).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
 
-          var _highlightMarkers = _highlightGroup.selectAll('g.marker-g').data(_markerData, function (d) {
-            return d.key;
-          });
+          var _drawTooltips = function _drawTooltips(data) {
+            var marker = _highlightGroup.selectAll('path.marker-rug').data(data, function (d) {
+              return d.key;
+            });
 
-          var _markerG = _highlightMarkers.enter().append('g').attr('class', function (d) {
-            return "marker-g ".concat(d.key);
-          }).attr('transform', function (d) {
-            return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ")");
-          });
+            marker.enter().append('path').attr('class', function (d) {
+              return "marker-rug ".concat(d.key);
+            }).attr('fill', 'none').attr('d', markerSymbol).attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
+            }).merge(marker).interrupt().transition(transition).attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
+            });
+            marker.exit().remove();
 
-          _markerG.append('path').attr('class', function (d) {
-            return "marker-rug ".concat(d.key);
-          }).style('transform', 'rotate(180deg)').attr('fill', 'none').attr('d', markerSymbol);
+            var markerText = _highlightGroup.selectAll('text.marker-text').data(data, function (d) {
+              return d.key;
+            });
 
-          _highlightMarkers.merge(_highlightMarkers).transition(transition).attr('transform', function (d) {
-            return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ")");
-          });
+            markerText.enter().append('text').attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+            }).attr('class', function (d) {
+              return "marker-text ".concat(d.key);
+            }).text(function (d) {
+              return "".concat(d.text);
+            }).attr('text-anchor', function (d) {
+              return _annoPos(d.text, d.value).xAnchor;
+            }).merge(markerText).interrupt().transition(transition).attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+            }).text(function (d) {
+              return "".concat(d.text);
+            }).attr('text-anchor', function (d) {
+              return _annoPos(d.text, d.value).xAnchor;
+            });
+            markerText.exit().remove(); // display values at point
 
-          _highlightMarkers.exit().remove();
+            var markerTextValues = _highlightGroup.selectAll('text.marker-textvalue').data(data, function (d) {
+              return d.key;
+            });
 
-          var markerText = _highlightGroup.selectAll('text.marker-text').data(_markerData, function (d) {
-            return d.key;
-          });
+            markerTextValues.enter().append('text').attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(props.height - props.margin.bottom + 12 + splitAxisHeight, ")");
+            }).attr('class', function (d) {
+              return "marker-textvalue ".concat(d.key);
+            }).text(function (d) {
+              return "".concat(tooltipNumberFormatter(d.value));
+            }).attr('text-anchor', function (d) {
+              return _annoPos(d.text, d.value).xAnchor;
+            }).merge(markerTextValues).interrupt().transition(transition).attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(props.height - props.margin.bottom + 12 + splitAxisHeight, ")");
+            }).text(function (d) {
+              return "".concat(tooltipNumberFormatter(d.value));
+            }).attr('text-anchor', function (d) {
+              return _annoPos(d.text, d.value).xAnchor;
+            });
+            markerTextValues.exit().remove();
+          }; // this.selection().select('.highlights').lower();
+          // TOOLTIP AND HIGHLIGHTS
 
-          markerText.enter().append('text').attr('transform', function (d) {
-            return "translate(".concat(xScaleRug(d.value) + annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
-          }).attr('class', function (d) {
-            return "marker-text ".concat(d.key);
-          }).text(function (d) {
-            return "".concat(d.text);
-          }).attr('text-anchor', function (d) {
-            return annoPos(d.text, d.value).xAnchor;
-          }).merge(markerText).transition(transition).attr('transform', function (d) {
-            return "translate(".concat(xScaleRug(d.value) + annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
-          }).text(function (d) {
-            return "".concat(d.text);
-          }).attr('text-anchor', function (d) {
-            return annoPos(d.text, d.value).xAnchor;
-          });
-          markerText.exit().remove();
-          this.selection().select('.highlights').lower(); // highlight the rugs
-          // deselect old rugs
 
-          this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false).style('stroke-width', props.rugProps.rugWidth).style('stroke', 'none').style('fill', props.rugProps.rugColor); // highlight new data
+          var _setDefaultTooltip = function _setDefaultTooltip() {
+            // draw highlight label
+            _drawTooltips(_markerData); // deselect old rugs
 
-          _markerData.forEach(function (element) {
-            _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).classed('highlighted', true).style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
+
+            _this2.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false).style('stroke-width', props.rugProps.rugWidth).style('stroke', 'none').style('fill', props.rugProps.rugColor); // highlight new data
+
+
+            _markerData.forEach(function (element) {
+              _this2.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', false);
+
+              _this2.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', false);
+
+              _this2.selection().select(".CountryRankingStrips .highlights path.marker-rug.".concat(element.key)).classed('active highlighted', true);
+
+              _this2.selection().select(".CountryRankingStrips .highlights text.marker-text.".concat(element.key)).classed('active highlighted', true);
+
+              _this2.selection().select(".CountryRankingStrips .highlights text.marker-textvalue.".concat(element.key)).classed('active highlighted', true);
+
+              _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).classed('highlighted', true).style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
+            });
+          };
+
+          var _getActiveTooltip = function _getActiveTooltip(pos) {
+            var mouseVal = xScaleRug.invert(pos);
+            var lookup = tooltipData.filter(function (d) {
+              return _markerData.find(function (e) {
+                return e.key !== d.key;
+              });
+            });
+            return lookup.reduce(function (prev, curr) {
+              return Math.abs(curr.value - mouseVal) < Math.abs(prev.value - mouseVal) ? curr : prev;
+            });
+          };
+
+          var _setActiveTooltip = function _setActiveTooltip(el) {
+            // draw hover label
+            _drawTooltips(el instanceof Array ? el : [el]);
+
+            _this2.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
+
+            _this2.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
+
+            _this2.selection().selectAll('.CountryRankingStrips .highlights text.marker-textvalue').classed('active', true); // hide the highlighted labels
+
+
+            _markerData.forEach(function (element) {
+              _this2.selection().select(".CountryRankingStrips .highlights path.marker-rug.".concat(element.key)).classed('active highlighted', false);
+
+              _this2.selection().select(".CountryRankingStrips .highlights text.marker-text.".concat(element.key)).classed('active highlighted', false);
+            });
+          }; // highlight the rugs
+
+
+          _setDefaultTooltip(); // this.selection().select('.CountryRankingStrips .highlights rect.highlight-bar')
+
+
+          rugBgBar.on('mouseenter mousemove touchstart touchmove', throttle(function () {
+            if (!d3.event) return;
+
+            _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0]));
+          }, 50));
+          rugBgBar.on('mouseleave touchend touchcancel', function () {
+            _setDefaultTooltip();
           });
         }
       } // HISTOGRAM CODE
