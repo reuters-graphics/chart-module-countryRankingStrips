@@ -6,6 +6,8 @@ import debounce from 'lodash/debounce';
 import defaultData from './defaultData.json';
 import covidData from './covidData.json';
 import popData from './popData.json';
+import max from 'lodash/maxBy';
+import min from 'lodash/minBy';
 import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 
 const client = new AtlasMetadataClient();
@@ -116,12 +118,13 @@ class ChartComponent extends React.Component {
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
-    this.chart1.data(DATA.casesPct).props({
+    this.chart1.data(dataAsia).props({
       rugProps: {
         height: 16,
-        tooltipData: DATA.casesPct,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
+        customAxisLabels: [{ pos: min(dataAsia, 'value').value, label: 'left-label' }, { pos: max(dataAsia, 'value').value, label: 'right-label' }],
+        showSplitAxis: false,
         annotation: [
           // {
           //   key: 'SD',
@@ -143,6 +146,12 @@ class ChartComponent extends React.Component {
         height: 16,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
+        customAxisLabels: [{ pos: min(DATA.deathsPct, 'value').value, label: '| decreasing most' }, { pos: max(DATA.deathsPct, 'value').value, label: 'increasing most |' }],
+        showSplitAxis: true,
+        splitAxis: {
+          value: 0,
+          // colors: ['green', 'red'],
+        },
         annotation: [
           // {
           //   key: 'SD',
@@ -165,7 +174,7 @@ class ChartComponent extends React.Component {
     // Use our chart module.
     this.chart1
       .selection(this.chart1Container.current)
-      .data(dataAsia)
+      .data(DATA.casesPct)
       .props({
         chartTitle: 'global cases',
         locale: 'en',
@@ -175,15 +184,25 @@ class ChartComponent extends React.Component {
         },
         height: 150,
         margin: {
-          top: 18,
-          right: 18,
-          bottom: 20,
-          left: 4,
+          top: 4,
+          right: 8,
+          bottom: 30,
+          left: 8,
         },
         rugPlot: true,
         rugProps: {
           height: 16,
           getTooltipText: (key) => `${key}works!`,
+          customAxisFormat: true,
+          customAxisLabels: [{ pos: min(DATA.casesPct, 'value').value, label: '| decreasing most' }, { pos: max(DATA.casesPct, 'value').value, label: 'increasing most |' }],
+          rugColor: 'rgba(255, 255, 255, 0.75)',
+          highlightWidth: 2,
+          highlightColor: '#eec331',
+          showSplitAxis: true,
+          splitAxis: {
+            value: 0,
+            // colors: ['green', 'red'],
+          },
           annotation: [
             {
               key: 'IN',
@@ -209,15 +228,21 @@ class ChartComponent extends React.Component {
         },
         height: 150,
         margin: {
-          top: 18,
-          right: 18,
-          bottom: 20,
-          left: 4,
+          top: 4,
+          right: 8,
+          bottom: 30,
+          left: 8,
         },
         rugPlot: true,
         rugProps: {
           height: 16,
           getTooltipText: (key) => `${key}works!`,
+          customAxisFormat: true,
+          customAxisLabels: [{ pos: min(dataAsia1, 'value').value, label: 'left-label' }, { pos: max(dataAsia1, 'value').value, label: 'right-label' }],
+          rugColor: 'rgba(255, 255, 255, 0.75)',
+          highlightWidth: 2,
+          highlightColor: '#eec331',
+          showSplitAxis: false,
           annotation: [
             {
               key: 'IN',

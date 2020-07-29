@@ -110,6 +110,22 @@
           text-anchor: end;
         }
       }
+      &.split-axis {
+        g.tick:first-of-type {
+          text-anchor: start;
+          text{
+            fill: #74c476;
+          }
+          
+        }
+        g.tick:last-of-type {
+          text-anchor: end;
+          text {
+            fill: #ee665b;
+          }
+          
+        }
+      }
     }
   }
 

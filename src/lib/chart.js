@@ -13,10 +13,10 @@ class CountryRankingStrips extends ChartComponent {
     },
     height: 100,
     margin: {
-      top: 18,
-      right: 18,
-      bottom: 20,
-      left: 4,
+      top: 4,
+      right: 8,
+      bottom: 30,
+      left: 8,
     },
     densityPlot: false,
     histogram: false,
@@ -33,13 +33,18 @@ class CountryRankingStrips extends ChartComponent {
     rugPlot: true,
     rugProps: {
       height: 16,
-      customAxisLabels: ['left-label', 'right-label'],
-      customAxisFormat: true,
       rugWidth: 1,
       rugColor: 'rgba(255, 255, 255, 0.75)',
       highlightWidth: 2,
       highlightColor: '#eec331',
       getTooltipText: (key) => key,
+      // customAxisLabels: [{ 0: 'left-label' }, { 100: 'right-label' }],
+      customAxisFormat: false,
+      showSplitAxis: false,
+      splitAxis: {
+        value: 0,
+        colors: ['#74c476', '#ee665b'],
+      },
       // annotation: [
       //   {
       //     key: 'ES',
@@ -349,8 +354,8 @@ class CountryRankingStrips extends ChartComponent {
         if (props.rugProps.customAxisLabels) {
           rugXAxis.call(
             d3.axisBottom(xScaleRug)
-              .tickValues(xScaleRug.domain())
-              .tickFormat((d, i) => props.rugProps.customAxisLabels[i])
+              .tickValues(props.rugProps.customAxisLabels.map(d => d.pos))
+              .tickFormat((d, i) => props.rugProps.customAxisLabels[i].label)
           );
         } else {
           rugXAxis.call(
@@ -364,6 +369,41 @@ class CountryRankingStrips extends ChartComponent {
           this.selection().select('.CountryRankingStrips .axis.axis-x').classed('customAxisFormat', 'true');
         }
       }
+      // custom split axis
+      const splitAxis = chartSVG.appendSelect('g.split-axis')
+        .attr('class', 'split-axis')
+        .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
+      if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
+        // left
+        splitAxis.appendSelect('rect.axis-left')
+          .attr('class', 'axis-left')
+          .style('fill', props.rugProps.splitAxis.colors[0])
+          .style('stroke', props.rugProps.splitAxis.colors[0])
+          .style('stroke-width', 1)
+          .attr('x', xScaleRug.range()[0])
+          .attr('y', -2)
+          .attr('height', 2)
+          .attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - 1);
+        // right
+        splitAxis.appendSelect('rect.axis-right')
+          .attr('class', 'axis-right')
+          .style('fill', props.rugProps.splitAxis.colors[1])
+          .style('stroke', props.rugProps.splitAxis.colors[1])
+          .style('stroke-width', 1)
+          .attr('x', xScaleRug(props.rugProps.splitAxis.value) + 1)
+          .attr('y', -2)
+          .attr('height', 2)
+          .attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value));
+
+        // add css colors to the axis labels
+        chartSVG.select('g.axis').classed('split-axis', true);
+        // chartSVG.select('g.axis.customAxisFormat g.tick:first-of-type text').style('fill', props.rugProps.splitAxis.colors[0]);
+        // chartSVG.select('g.axis.customAxisFormat g.tick:last-of-type text').style('fill', props.rugProps.splitAxis.colors[1]);
+      } else {
+        splitAxis.remove();
+        chartSVG.select('g.axis').classed('split-axis', false);
+      }
+
       const rugPlot = plot.appendSelect('g.rugplot')
         .attr('class', 'rugplot');
 
@@ -529,7 +569,6 @@ class CountryRankingStrips extends ChartComponent {
 
         // highlight the rugs
         _setDefaultTooltip();
-
         // this.selection().select('.CountryRankingStrips .highlights rect.highlight-bar')
         rugBgBar.on('mouseenter mousemove', throttle(() => {
           if (!d3.event) return;
