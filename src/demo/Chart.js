@@ -146,7 +146,7 @@ class ChartComponent extends React.Component {
         height: 16,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
-        customAxisLabels: [{ pos: min(DATA.deathsPct, 'value').value, label: '| decreasing most' }, { pos: max(DATA.deathsPct, 'value').value, label: 'increasing most |' }],
+        customAxisLabels: [{ pos: min(DATA.deathsPct, 'value').value, label: '← decreasing most' }, { pos: max(DATA.deathsPct, 'value').value, label: 'increasing most →' }],
         showSplitAxis: true,
         splitAxis: {
           value: 0,
@@ -186,7 +186,7 @@ class ChartComponent extends React.Component {
         margin: {
           top: 4,
           right: 8,
-          bottom: 30,
+          bottom: 36,
           left: 8,
         },
         rugPlot: true,
@@ -230,7 +230,7 @@ class ChartComponent extends React.Component {
         margin: {
           top: 4,
           right: 8,
-          bottom: 30,
+          bottom: 36,
           left: 8,
         },
         rugPlot: true,

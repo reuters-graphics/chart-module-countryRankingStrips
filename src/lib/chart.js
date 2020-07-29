@@ -1,5 +1,7 @@
 import ChartComponent from './base/ChartComponent';
 import d3 from './utils/d3';
+// import { num2unitwords } from './utils/utils';
+
 import D3Locale from '@reuters-graphics/d3-locale';
 import throttle from 'lodash/throttle';
 
@@ -15,7 +17,7 @@ class CountryRankingStrips extends ChartComponent {
     margin: {
       top: 4,
       right: 8,
-      bottom: 30,
+      bottom: 36,
       left: 8,
     },
     densityPlot: false,
@@ -38,7 +40,8 @@ class CountryRankingStrips extends ChartComponent {
       highlightWidth: 2,
       highlightColor: '#eec331',
       getTooltipText: (key) => key,
-      // customAxisLabels: [{ 0: 'left-label' }, { 100: 'right-label' }],
+      // tooltipNumberFormatter: (num) => num,
+      customAxisLabels: [],
       customAxisFormat: false,
       showSplitAxis: false,
       splitAxis: {
@@ -79,6 +82,8 @@ class CountryRankingStrips extends ChartComponent {
     // number formatters
     const locale = new D3Locale(props.locale);
     const numFormat = locale.format(',');
+    const num2unitwords = locale.format('.3~s');
+    const tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || num2unitwords;
 
     // ADD CHART TITLE
     if (props.chartTitle) {
@@ -356,12 +361,14 @@ class CountryRankingStrips extends ChartComponent {
             d3.axisBottom(xScaleRug)
               .tickValues(props.rugProps.customAxisLabels.map(d => d.pos))
               .tickFormat((d, i) => props.rugProps.customAxisLabels[i].label)
+              .tickSize(20)
           );
         } else {
           rugXAxis.call(
             d3.axisBottom(xScaleRug)
               .tickValues(xScaleRug.domain())
               .tickFormat(numFormat)
+              .tickSize(20)
           );
         }
         // custom label format
@@ -370,10 +377,12 @@ class CountryRankingStrips extends ChartComponent {
         }
       }
       // custom split axis
+      let splitAxisHeight = 0;
       const splitAxis = chartSVG.appendSelect('g.split-axis')
         .attr('class', 'split-axis')
         .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
       if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
+        splitAxisHeight = 2;
         // left
         splitAxis.appendSelect('rect.axis-left')
           .attr('class', 'axis-left')
@@ -382,7 +391,7 @@ class CountryRankingStrips extends ChartComponent {
           .style('stroke-width', 1)
           .attr('x', xScaleRug.range()[0])
           .attr('y', -2)
-          .attr('height', 2)
+          .attr('height', splitAxisHeight)
           .attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - 1);
         // right
         splitAxis.appendSelect('rect.axis-right')
@@ -392,7 +401,7 @@ class CountryRankingStrips extends ChartComponent {
           .style('stroke-width', 1)
           .attr('x', xScaleRug(props.rugProps.splitAxis.value) + 1)
           .attr('y', -2)
-          .attr('height', 2)
+          .attr('height', splitAxisHeight)
           .attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value));
 
         // add css colors to the axis labels
@@ -516,6 +525,24 @@ class CountryRankingStrips extends ChartComponent {
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);
 
           markerText.exit().remove();
+
+          // display values at point
+          const markerTextValues = highlightGroup.selectAll('text.marker-textvalue')
+            .data(data, d => d.key);
+
+          markerTextValues.enter().append('text')
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
+            .attr('class', d => `marker-textvalue ${d.key}`)
+            .text(d => `${tooltipNumberFormatter(d.value)}`)
+            .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor)
+            .merge(markerTextValues)
+            .interrupt()
+            .transition(transition)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
+            .text(d => `${tooltipNumberFormatter(d.value)}`)
+            .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);
+
+          markerTextValues.exit().remove();
         };
 
         // this.selection().select('.highlights').lower();
@@ -537,6 +564,7 @@ class CountryRankingStrips extends ChartComponent {
 
             this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', true);
             this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', true);
+            this.selection().select(`.CountryRankingStrips .highlights text.marker-textvalue.${element.key}`).classed('active highlighted', true);
 
             this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
               .style('stroke-width', props.rugProps.highlightWidth / 2)
@@ -559,6 +587,7 @@ class CountryRankingStrips extends ChartComponent {
 
           this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
           this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
+          this.selection().selectAll('.CountryRankingStrips .highlights text.marker-textvalue').classed('active', true);
 
           // hide the highlighted labels
           markerData.forEach(element => {
@@ -570,12 +599,12 @@ class CountryRankingStrips extends ChartComponent {
         // highlight the rugs
         _setDefaultTooltip();
         // this.selection().select('.CountryRankingStrips .highlights rect.highlight-bar')
-        rugBgBar.on('mouseenter mousemove', throttle(() => {
+        rugBgBar.on('mouseenter mousemove touchstart touchmove', throttle(() => {
           if (!d3.event) return;
           _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0]));
         }, 50));
 
-        rugBgBar.on('mouseleave', () => {
+        rugBgBar.on('mouseleave touchend touchcancel', () => {
           _setDefaultTooltip();
         });
       }

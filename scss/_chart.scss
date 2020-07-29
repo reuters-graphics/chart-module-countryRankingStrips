@@ -70,6 +70,10 @@
         text {
           fill: $text-color;
           font-size: 1rem;
+          &.marker-textvalue {
+            font-size: 0.8rem;
+            // fill: #999;
+          }
           // font-weight: bold;
           display: none;
 
@@ -77,9 +81,8 @@
             display: block;
           }
 
-          &.highlighted {
+          &.highlighted:not(.marker-textvalue) {
             fill: $dark-yellow;
-            font-size: 1rem;
             font-weight: bold;
           }
         }
