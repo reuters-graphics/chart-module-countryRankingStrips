@@ -126,10 +126,10 @@ class ChartComponent extends React.Component {
         customAxisLabels: [{ pos: min(dataAsia, 'value').value, label: 'left-label' }, { pos: max(dataAsia, 'value').value, label: 'right-label' }],
         showSplitAxis: false,
         annotation: [
-          // {
-          //   key: 'SD',
-          //   text: 'SD',
-          // },
+          {
+            key: 'PK',
+            text: 'PK',
+          },
           // {
           //   key: 'ME',
           //   text: 'ME',
@@ -153,10 +153,10 @@ class ChartComponent extends React.Component {
           // colors: ['green', 'red'],
         },
         annotation: [
-          // {
-          //   key: 'SD',
-          //   text: 'SD',
-          // },
+          {
+            key: 'SD',
+            text: 'SD',
+          },
           // {
           //   key: 'ME',
           //   text: 'ME',

@@ -494,12 +494,14 @@ class CountryRankingStrips extends ChartComponent {
           .attr('height', rugPosition.height)
           .attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
 
-        const _drawTooltips = (data) => {
+        const _drawTooltips = (data, classList) => {
           const marker = highlightGroup.selectAll('path.marker-rug')
             .data(data, d => d.key);
 
           marker.enter().append('path')
-            .attr('class', d => `marker-rug ${d.key}`)
+            .attr('class', d => {
+              return markerData.find(m => m.key === d.key) ? `marker-rug ${d.key} ${classList} highlighted` : `marker-rug ${d.key} ${classList}`;
+            })
             .attr('fill', 'none')
             .attr('d', markerSymbol)
             .attr('transform', d => `translate(${xScaleRug(d.value)}, ${rugPosition.y - markerPos}) rotate(180)`)
@@ -514,7 +516,9 @@ class CountryRankingStrips extends ChartComponent {
 
           markerText.enter().append('text')
             .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 2 * markerPos - 2})`)
-            .attr('class', d => `marker-text ${d.key}`)
+            .attr('class', d => {
+              return markerData.find(m => m.key === d.key) ? `marker-text ${d.key} ${classList} highlighted` : `marker-text ${d.key} ${classList}`;
+            })
             .text(d => `${d.text}`)
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor)
             .merge(markerText)
@@ -532,7 +536,7 @@ class CountryRankingStrips extends ChartComponent {
 
           markerTextValues.enter().append('text')
             .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
-            .attr('class', d => `marker-textvalue ${d.key}`)
+            .attr('class', d => `marker-textvalue ${d.key} ${classList}`)
             .text(d => `${tooltipNumberFormatter(d.value)}`)
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor)
             .merge(markerTextValues)
@@ -550,21 +554,21 @@ class CountryRankingStrips extends ChartComponent {
         // TOOLTIP AND HIGHLIGHTS
         const _setDefaultTooltip = () => {
           // draw highlight label
-          _drawTooltips(markerData);
+          _drawTooltips(markerData, 'active');
 
           // deselect old rugs
           this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false)
             .style('stroke-width', props.rugProps.rugWidth)
             .style('stroke', 'none')
             .style('fill', props.rugProps.rugColor);
-          // highlight new data
+          // // highlight new data
           markerData.forEach(element => {
-            this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', false);
-            this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', false);
+          //   this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', false);
+          //   this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', false);
 
-            this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', true);
-            this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', true);
-            this.selection().select(`.CountryRankingStrips .highlights text.marker-textvalue.${element.key}`).classed('active highlighted', true);
+            //   this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', true);
+            //   this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', true);
+            //   this.selection().select(`.CountryRankingStrips .highlights text.marker-textvalue.${element.key}`).classed('active highlighted', true);
 
             this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
               .style('stroke-width', props.rugProps.highlightWidth / 2)
@@ -576,24 +580,24 @@ class CountryRankingStrips extends ChartComponent {
 
         const _getActiveTooltip = (pos) => {
           const mouseVal = xScaleRug.invert(pos);
-          const lookup = tooltipData.filter(d => markerData.find(e => e.key !== d.key));
-          return lookup.reduce((prev, curr) => {
+          // const lookup = tooltipData.filter(d => markerData.find(e => e.key !== d.key));
+          return tooltipData.reduce((prev, curr) => {
             return (Math.abs(curr.value - mouseVal) < Math.abs(prev.value - mouseVal) ? curr : prev);
           });
         };
         const _setActiveTooltip = (el) => {
           // draw hover label
-          _drawTooltips((el instanceof Array) ? el : [el]);
+          _drawTooltips((el instanceof Array) ? el : [el], 'active');
 
-          this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
-          this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
-          this.selection().selectAll('.CountryRankingStrips .highlights text.marker-textvalue').classed('active', true);
+          // this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
+          // this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
+          // this.selection().selectAll('.CountryRankingStrips .highlights text.marker-textvalue').classed('active', true);
 
-          // hide the highlighted labels
-          markerData.forEach(element => {
-            this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', false);
-            this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', false);
-          });
+          // // hide the highlighted labels
+          // markerData.forEach(element => {
+          //   this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', false);
+          //   this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', false);
+          // });
         };
 
         // highlight the rugs
