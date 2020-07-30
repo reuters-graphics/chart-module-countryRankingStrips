@@ -64,7 +64,7 @@
           }
 
           &.highlighted {
-            fill: $dark-yellow;
+            fill: $yellow;
           }
         }
         text {
@@ -82,8 +82,8 @@
           }
 
           &.highlighted:not(.marker-textvalue) {
-            fill: $dark-yellow;
-            font-weight: bold;
+            fill: $yellow;
+            // font-weight: bold;
           }
         }
       
