@@ -429,6 +429,7 @@ class CountryRankingStrips extends ChartComponent {
         .attr('width', props.rugProps.rugWidth)
         .merge(rugs)
         .transition(transition)
+        .attr('data-value', d => `${d[props.dataParams.value]}`)
         .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)

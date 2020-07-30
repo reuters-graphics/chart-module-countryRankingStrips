@@ -795,7 +795,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         }).style('fill', props.rugProps.rugColor) // .style('fill', d => d[props.dataParams.value] < 0 ? '#ee665b' : '#74c476')
         .attr('x', function (d) {
           return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
-        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth).merge(rugs).transition(transition).attr('x', function (d) {
+        }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth).merge(rugs).transition(transition).attr('data-value', function (d) {
+          return "".concat(d[props.dataParams.value]);
+        }).attr('x', function (d) {
           return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth);
         rugs.exit().remove(); // add highlight
