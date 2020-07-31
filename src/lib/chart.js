@@ -82,8 +82,8 @@ class CountryRankingStrips extends ChartComponent {
     // number formatters
     const locale = new D3Locale(props.locale);
     const numFormat = locale.format(',');
-    const num2unitwords = locale.format('.3~s');
-    const tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || num2unitwords;
+    // const num2unitwords = locale.format('.3~s');
+    const tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || numFormat;
 
     // ADD CHART TITLE
     if (props.chartTitle) {
@@ -353,7 +353,7 @@ class CountryRankingStrips extends ChartComponent {
           .range([props.margin.left, width - props.margin.right]);
         const rugXAxis = chartSVG.appendSelect('g.axis-x')
           .attr('class', 'axis axis-x')
-          .transition(transition)
+          // .transition(transition)
           .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
 
         if (props.rugProps.customAxisLabels) {
