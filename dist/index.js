@@ -533,9 +533,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       var transition = d3.transition().duration(750); // number formatters
 
       var locale = new D3Locale(props.locale);
-      var numFormat = locale.format(',');
-      var num2unitwords = locale.format('.3~s');
-      var tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || num2unitwords; // ADD CHART TITLE
+      var numFormat = locale.format(','); // const num2unitwords = locale.format('.3~s');
+
+      var tooltipNumberFormatter = props.rugProps.tooltipNumberFormatter || numFormat; // ADD CHART TITLE
 
       if (props.chartTitle) {
         this.selection().appendSelect('div.chart-title').attr('class', 'font-display chart-title').html("<h6>".concat(props.chartTitle, "</h6>"));
@@ -748,7 +748,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         } else {
           xScaleRug = d3.scaleLinear().domain(d3.extent(dataValues)) // .domain([-d3.extent(dataValues)[1], d3.extent(dataValues)[1]])
           .range([props.margin.left, width - props.margin.right]);
-          var rugXAxis = chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x').transition(transition).attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
+          var rugXAxis = chartSVG.appendSelect('g.axis-x').attr('class', 'axis axis-x') // .transition(transition)
+          .attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
 
           if (props.rugProps.customAxisLabels) {
             rugXAxis.call(d3.axisBottom(xScaleRug).tickValues(props.rugProps.customAxisLabels.map(function (d) {
