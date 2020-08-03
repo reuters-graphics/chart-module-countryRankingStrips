@@ -107,6 +107,8 @@ const dummyData = defaultData.map((d, i) => {
   };
 });
 
+console.log(DATA.cases);
+
 class ChartComponent extends React.Component {
   state = { width: '' };
   chart1Container = React.createRef();
