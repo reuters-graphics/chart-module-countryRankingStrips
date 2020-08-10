@@ -30,13 +30,14 @@ DATA.deaths = Object.keys(covidData.latestTotals.deaths).map(element => {
 DATA.casesPct = Object.keys(covidData.latestWeeklyAvgs.cases).map(element => {
   return {
     key: element,
-    value: 100 * (covidData.latestWeeklyAvgs.cases[element].slice(-1)[0] - covidData.latestWeeklyAvgs.cases[element].slice(-2)[0]),
+    value: 100 * (covidData.latestWeeklyAvgs.cases[element].slice(-1)[0] - covidData.latestWeeklyAvgs.cases[element].slice(-2)[0]) / covidData.latestWeeklyAvgs.cases[element].slice(-2)[0],
   };
 });
+DATA.casesPct = DATA.casesPct.filter(d => (d.value !== Infinity));
 DATA.deathsPct = Object.keys(covidData.latestWeeklyAvgs.deaths).map(element => {
   return {
     key: element,
-    value: 100 * (covidData.latestWeeklyAvgs.deaths[element].slice(-1)[0] - covidData.latestWeeklyAvgs.deaths[element].slice(-2)[0]),
+    value: 100 * (covidData.latestWeeklyAvgs.deaths[element].slice(-1)[0] - covidData.latestWeeklyAvgs.deaths[element].slice(-2)[0]) / covidData.latestWeeklyAvgs.deaths[element].slice(-2)[0],
   };
 });
 
@@ -89,7 +90,7 @@ const dataAsia = DATA.cases.filter(d => _getCountryList('Asia').includes(d.key))
 const dataLatam = DATA.cases.filter(d => _getCountryList('Latin America and the Caribbean').includes(d.key));
 const dataAfrica = DATA.cases.filter(d => _getCountryList('Africa').includes(d.key));
 const dataOceania = DATA.cases.filter(d => _getCountryList('Oceania').includes(d.key));
-const dataNAmerica = DATA.cases.filter(d => _getCountryList('Northern America').includes(d.key));
+const dataNAmerica = DATA.casesPct.filter(d => _getCountryList('Northern America').includes(d.key));
 
 // deaths
 const dataEurope1 = DATA.deaths.filter(d => _getCountryList('Europe').includes(d.key));
@@ -176,7 +177,7 @@ class ChartComponent extends React.Component {
     // Use our chart module.
     this.chart1
       .selection(this.chart1Container.current)
-      .data(DATA.casesPct)
+      .data(dataNAmerica)
       .props({
         chartTitle: 'global cases',
         locale: 'en',
@@ -196,7 +197,7 @@ class ChartComponent extends React.Component {
           height: 16,
           getTooltipText: (key) => `${key}works!`,
           customAxisFormat: true,
-          customAxisLabels: [{ pos: min(DATA.casesPct, 'value').value, label: '| decreasing most' }, { pos: max(DATA.casesPct, 'value').value, label: 'increasing most |' }],
+          customAxisLabels: [{ pos: min(dataNAmerica, 'value').value, label: '| decreasing most' }, { pos: max(dataNAmerica, 'value').value, label: 'increasing most |' }],
           rugColor: 'rgba(255, 255, 255, 0.75)',
           highlightWidth: 2,
           highlightColor: '#eec331',
@@ -207,7 +208,7 @@ class ChartComponent extends React.Component {
           },
           annotation: [
             {
-              key: 'IN',
+              key: 'US',
               // text: 'India',
             },
             // {

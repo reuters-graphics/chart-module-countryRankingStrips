@@ -378,11 +378,23 @@ class CountryRankingStrips extends ChartComponent {
       }
       // custom split axis
       let splitAxisHeight = 0;
+      let gapBwAxis = 1;
+
       const splitAxis = chartSVG.appendSelect('g.split-axis')
         .attr('class', 'split-axis')
         .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
       if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
         splitAxisHeight = 2;
+        // check if split point value is in domain
+        if (props.rugProps.splitAxis.value >= xScaleRug.domain()[1]) {
+          props.rugProps.splitAxis.value = xScaleRug.domain()[1];
+          gapBwAxis = 0;
+          console.log('G');
+        } if (props.rugProps.splitAxis.value <= xScaleRug.domain()[0]) {
+          props.rugProps.splitAxis.value = xScaleRug.domain()[0];
+          gapBwAxis = 0;
+          console.log('S');
+        }
         // left
         splitAxis.appendSelect('rect.axis-left')
           .attr('class', 'axis-left')
@@ -392,14 +404,14 @@ class CountryRankingStrips extends ChartComponent {
           .attr('x', xScaleRug.range()[0])
           .attr('y', -2)
           .attr('height', splitAxisHeight)
-          .attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - 1);
+          .attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - gapBwAxis);
         // right
         splitAxis.appendSelect('rect.axis-right')
           .attr('class', 'axis-right')
           .style('fill', props.rugProps.splitAxis.colors[1])
           .style('stroke', props.rugProps.splitAxis.colors[1])
           .style('stroke-width', 1)
-          .attr('x', xScaleRug(props.rugProps.splitAxis.value) + 1)
+          .attr('x', xScaleRug(props.rugProps.splitAxis.value) + gapBwAxis)
           .attr('y', -2)
           .attr('height', splitAxisHeight)
           .attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value));
