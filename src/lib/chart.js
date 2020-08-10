@@ -389,11 +389,11 @@ class CountryRankingStrips extends ChartComponent {
         if (props.rugProps.splitAxis.value >= xScaleRug.domain()[1]) {
           props.rugProps.splitAxis.value = xScaleRug.domain()[1];
           gapBwAxis = 0;
-          console.log('G');
+          // console.log('G');
         } if (props.rugProps.splitAxis.value <= xScaleRug.domain()[0]) {
           props.rugProps.splitAxis.value = xScaleRug.domain()[0];
           gapBwAxis = 0;
-          console.log('S');
+          // console.log('S');
         }
         // left
         splitAxis.appendSelect('rect.axis-left')

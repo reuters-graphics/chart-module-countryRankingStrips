@@ -769,14 +769,26 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
 
         var splitAxisHeight = 0;
+        var gapBwAxis = 1;
         var splitAxis = chartSVG.appendSelect('g.split-axis').attr('class', 'split-axis').attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
 
         if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
-          splitAxisHeight = 2; // left
+          splitAxisHeight = 2; // check if split point value is in domain
 
-          splitAxis.appendSelect('rect.axis-left').attr('class', 'axis-left').style('fill', props.rugProps.splitAxis.colors[0]).style('stroke', props.rugProps.splitAxis.colors[0]).style('stroke-width', 1).attr('x', xScaleRug.range()[0]).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - 1); // right
+          if (props.rugProps.splitAxis.value >= xScaleRug.domain()[1]) {
+            props.rugProps.splitAxis.value = xScaleRug.domain()[1];
+            gapBwAxis = 0; // console.log('G');
+          }
 
-          splitAxis.appendSelect('rect.axis-right').attr('class', 'axis-right').style('fill', props.rugProps.splitAxis.colors[1]).style('stroke', props.rugProps.splitAxis.colors[1]).style('stroke-width', 1).attr('x', xScaleRug(props.rugProps.splitAxis.value) + 1).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value)); // add css colors to the axis labels
+          if (props.rugProps.splitAxis.value <= xScaleRug.domain()[0]) {
+            props.rugProps.splitAxis.value = xScaleRug.domain()[0];
+            gapBwAxis = 0; // console.log('S');
+          } // left
+
+
+          splitAxis.appendSelect('rect.axis-left').attr('class', 'axis-left').style('fill', props.rugProps.splitAxis.colors[0]).style('stroke', props.rugProps.splitAxis.colors[0]).style('stroke-width', 1).attr('x', xScaleRug.range()[0]).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug(props.rugProps.splitAxis.value) - xScaleRug.range()[0] - gapBwAxis); // right
+
+          splitAxis.appendSelect('rect.axis-right').attr('class', 'axis-right').style('fill', props.rugProps.splitAxis.colors[1]).style('stroke', props.rugProps.splitAxis.colors[1]).style('stroke-width', 1).attr('x', xScaleRug(props.rugProps.splitAxis.value) + gapBwAxis).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value)); // add css colors to the axis labels
 
           chartSVG.select('g.axis').classed('split-axis', true); // chartSVG.select('g.axis.customAxisFormat g.tick:first-of-type text').style('fill', props.rugProps.splitAxis.colors[0]);
           // chartSVG.select('g.axis.customAxisFormat g.tick:last-of-type text').style('fill', props.rugProps.splitAxis.colors[1]);
