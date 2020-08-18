@@ -149,6 +149,8 @@ rugProps: {
   rugColor: 'rgba(255, 255, 255, 0.75)',
   highlightWidth: 2, // adds half of this value as stroke
   highlightColor: '#eec331', 
+  activeRugZoom: 2, // amount in pixels the rug pops out on hover
+  showTipMarker: true, // show or hide the tip marker
   annotation: [ // if no text is specified, shows just a pointer by default
      {
     key: 'US',

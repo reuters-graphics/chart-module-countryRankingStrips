@@ -123,7 +123,7 @@ class ChartComponent extends React.Component {
   resize = debounce(() => {
     this.chart1.data(dataAsia).props({
       rugProps: {
-        height: 16,
+        height: 26,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
         customAxisLabels: [{ pos: min(dataAsia, 'value').value, label: 'left-label' }, { pos: max(dataAsia, 'value').value, label: 'right-label' }],
@@ -146,7 +146,7 @@ class ChartComponent extends React.Component {
     }).draw();
     this.chart2.props({
       rugProps: {
-        height: 16,
+        height: 26,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
         customAxisLabels: [{ pos: min(DATA.deathsPct, 'value').value, label: '← decreasing most' }, { pos: max(DATA.deathsPct, 'value').value, label: 'increasing most →' }],
@@ -194,7 +194,7 @@ class ChartComponent extends React.Component {
         },
         rugPlot: true,
         rugProps: {
-          height: 16,
+          height: 18,
           getTooltipText: (key) => `${key}works!`,
           customAxisFormat: true,
           customAxisLabels: [{ pos: min(dataNAmerica, 'value').value, label: '| decreasing most' }, { pos: max(dataNAmerica, 'value').value, label: 'increasing most |' }],
@@ -238,7 +238,7 @@ class ChartComponent extends React.Component {
         },
         rugPlot: true,
         rugProps: {
-          height: 16,
+          height: 18,
           getTooltipText: (key) => `${key}works!`,
           customAxisFormat: true,
           customAxisLabels: [{ pos: min(dataAsia1, 'value').value, label: 'left-label' }, { pos: max(dataAsia1, 'value').value, label: 'right-label' }],

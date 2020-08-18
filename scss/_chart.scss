@@ -33,9 +33,16 @@
       rect {
         fill: $text-color;
         opacity: 0.55;
+
         &.highlighted {
-          fill: $dark-yellow;
+          // fill: $dark-yellow;
           opacity: 1;
+        }
+
+        &.active {
+          opacity: 1;
+          stroke-width: 0.5;
+          stroke: $dark-blue;
         }
       }
     }
@@ -47,6 +54,9 @@
       stroke-width: 0;
       stroke: $text-color;
       opacity: 0.55;
+      cursor: crosshair;
+    }
+    rect.touch-area {
       cursor: crosshair;
     }
     .highlights {
