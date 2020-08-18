@@ -169,6 +169,7 @@ rugProps: {
     value: 0, // value to split the axis at
     colors: ['#74c476', '#ee665b'],
   },
+  textHeight: 16, // line-height for tooltip text
   getTooltipText: (key) => key, // function to fetch text to be shown on the tooltips
   tooltipNumberFormatter: (num) => num, // number formatter based on number type and locale
 }

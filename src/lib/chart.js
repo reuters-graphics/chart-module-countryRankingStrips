@@ -40,8 +40,9 @@ class CountryRankingStrips extends ChartComponent {
       highlightWidth: 2,
       highlightColor: '#eec331',
       activeRugZoom: 4,
-      showTipMarker: false,
+      showTipMarker: true,
       getTooltipText: (key) => key,
+      textHeight: 16,
       // tooltipNumberFormatter: (num) => num,
       customAxisLabels: [],
       customAxisFormat: false,
@@ -545,7 +546,7 @@ class CountryRankingStrips extends ChartComponent {
             .data(data, d => d.key);
 
           markerText.enter().append('text')
-            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18})`)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight * 1.414})`)
             .attr('class', d => {
               return markerData.find(m => m.key === d.key) ? `marker-text ${d.key} ${classList} highlighted` : `marker-text ${d.key} ${classList}`;
             })
@@ -554,7 +555,7 @@ class CountryRankingStrips extends ChartComponent {
             .merge(markerText)
             .interrupt()
             .transition(transition)
-            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18})`)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight * 1.414})`)
             .text(d => `${d.text}`)
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);
 
@@ -566,14 +567,14 @@ class CountryRankingStrips extends ChartComponent {
 
           markerTextValues.enter().append('text')
             // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
-            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2})`)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight / 4})`)
             .attr('class', d => `marker-textvalue ${d.key} ${classList}`)
             .text(d => `${tooltipNumberFormatter(d.value)}`)
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor)
             .merge(markerTextValues)
             .interrupt()
             .transition(transition)
-            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2})`)
+            .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight / 4})`)
             // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
             .text(d => `${tooltipNumberFormatter(d.value)}`)
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);

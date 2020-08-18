@@ -485,10 +485,11 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         highlightWidth: 2,
         highlightColor: '#eec331',
         activeRugZoom: 4,
-        showTipMarker: false,
+        showTipMarker: true,
         getTooltipText: function getTooltipText(key) {
           return key;
         },
+        textHeight: 16,
         // tooltipNumberFormatter: (num) => num,
         customAxisLabels: [],
         customAxisFormat: false,
@@ -897,7 +898,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             });
 
             markerText.enter().append('text').attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight * 1.414, ")");
             }).attr('class', function (d) {
               return _markerData.find(function (m) {
                 return m.key === d.key;
@@ -907,7 +908,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             }).attr('text-anchor', function (d) {
               return _annoPos(d.text, d.value).xAnchor;
             }).merge(markerText).interrupt().transition(transition).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight * 1.414, ")");
             }).text(function (d) {
               return "".concat(d.text);
             }).attr('text-anchor', function (d) {
@@ -921,7 +922,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
             markerTextValues.enter().append('text') // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
             .attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight / 4, ")");
             }).attr('class', function (d) {
               return "marker-textvalue ".concat(d.key, " ").concat(classList);
             }).text(function (d) {
@@ -929,7 +930,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             }).attr('text-anchor', function (d) {
               return _annoPos(d.text, d.value).xAnchor;
             }).merge(markerTextValues).interrupt().transition(transition).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - props.rugProps.textHeight / 4, ")");
             }) // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
             .text(function (d) {
               return "".concat(tooltipNumberFormatter(d.value));
