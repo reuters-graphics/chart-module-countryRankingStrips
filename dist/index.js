@@ -484,6 +484,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         rugColor: 'rgba(255, 255, 255, 0.75)',
         highlightWidth: 2,
         highlightColor: '#eec331',
+        activeRugZoom: 4,
+        showTipMarker: true,
         getTooltipText: function getTooltipText(key) {
           return key;
         },
@@ -738,7 +740,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
       if (props.rugPlot) {
         var rugPosition = {
-          y: props.height - props.margin.bottom - props.rugProps.height - 4,
+          y: props.height - props.margin.bottom - 13,
           height: props.rugProps.height
         };
         var xScaleRug; // add rugplot axis
@@ -768,13 +770,13 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         } // custom split axis
 
 
-        var splitAxisHeight = 0;
+        var splitAxisHeight = 2;
         var gapBwAxis = 1;
-        var splitAxis = chartSVG.appendSelect('g.split-axis').attr('class', 'split-axis').attr('transform', "translate(0,".concat(props.height - props.margin.bottom, ")"));
+        var splitAxis = chartSVG.appendSelect('g.split-axis').attr('class', 'split-axis').attr('transform', "translate(0,".concat(rugPosition.y + rugPosition.height + splitAxisHeight * 2, ")"));
 
         if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
-          splitAxisHeight = 2; // check if split point value is in domain
-
+          // splitAxisHeight = 2;
+          // check if split point value is in domain
           if (props.rugProps.splitAxis.value >= xScaleRug.domain()[1]) {
             props.rugProps.splitAxis.value = xScaleRug.domain()[1];
             gapBwAxis = 0; // console.log('G');
@@ -790,7 +792,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
           splitAxis.appendSelect('rect.axis-right').attr('class', 'axis-right').style('fill', props.rugProps.splitAxis.colors[1]).style('stroke', props.rugProps.splitAxis.colors[1]).style('stroke-width', 1).attr('x', xScaleRug(props.rugProps.splitAxis.value) + gapBwAxis).attr('y', -2).attr('height', splitAxisHeight).attr('width', xScaleRug.range()[1] - xScaleRug(props.rugProps.splitAxis.value)); // add css colors to the axis labels
 
-          chartSVG.select('g.axis').classed('split-axis', true); // chartSVG.select('g.axis.customAxisFormat g.tick:first-of-type text').style('fill', props.rugProps.splitAxis.colors[0]);
+          chartSVG.select('g.axis').classed('split-axis', true).lower(); // chartSVG.select('g.axis.customAxisFormat g.tick:first-of-type text').style('fill', props.rugProps.splitAxis.colors[0]);
           // chartSVG.select('g.axis.customAxisFormat g.tick:last-of-type text').style('fill', props.rugProps.splitAxis.colors[1]);
         } else {
           splitAxis.remove();
@@ -813,7 +815,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         }).attr('x', function (d) {
           return xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2;
         }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', props.rugProps.rugWidth);
-        rugs.exit().remove(); // add highlight
+        rugs.exit().remove();
+        plot.raise(); // add highlight
 
         if (props.rugProps.annotation && !(props.histogram || props.densityPlot)) {
           var _markerData = props.rugProps.annotation.map(function (element) {
@@ -860,36 +863,41 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             };
           };
 
-          var markerPos = Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) + 4;
+          var markerPos = Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) + props.rugProps.activeRugZoom * 2;
           var markerSymbol = d3.symbol().type(d3.symbolTriangle).size(rugPosition.height * 3);
+          var markerRadius = props.rugProps.showTipMarker ? Math.sqrt(2 * (rugPosition.height * 3) / Math.PI) : 0;
 
           var _highlightGroup = chartSVG.appendSelect('g.highlights').attr('class', 'highlights');
 
           var rugBgBar = _highlightGroup.appendSelect('rect.highlight-bar').attr('class', 'highlight-bar') // .style('opacity', 0.55)
           .attr('x', xScaleRug.range()[0]).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]);
 
-          var _drawTooltips = function _drawTooltips(data, classList) {
-            var marker = _highlightGroup.selectAll('path.marker-rug').data(data, function (d) {
-              return d.key;
-            });
+          var rugTouchArea = chartSVG.appendSelect('rect.touch-area').attr('class', 'touch-area').style('fill', 'transparent').style('stroke', 'none').attr('x', xScaleRug.range()[0]).attr('y', 0).attr('height', props.height).attr('width', xScaleRug.range()[1] - xScaleRug.range()[0]).raise();
 
-            marker.enter().append('path').attr('class', function (d) {
-              return _markerData.find(function (m) {
-                return m.key === d.key;
-              }) ? "marker-rug ".concat(d.key, " ").concat(classList, " highlighted") : "marker-rug ".concat(d.key, " ").concat(classList);
-            }).attr('fill', 'none').attr('d', markerSymbol).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
-            }).merge(marker).interrupt().transition(transition).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
-            });
-            marker.exit().remove();
+          var _drawTooltips = function _drawTooltips(data, classList) {
+            if (props.rugProps.showTipMarker) {
+              var marker = _highlightGroup.selectAll('path.marker-rug').data(data, function (d) {
+                return d.key;
+              });
+
+              marker.enter().append('path').attr('class', function (d) {
+                return _markerData.find(function (m) {
+                  return m.key === d.key;
+                }) ? "marker-rug ".concat(d.key, " ").concat(classList, " highlighted") : "marker-rug ".concat(d.key, " ").concat(classList);
+              }).attr('fill', 'none').attr('d', markerSymbol).attr('transform', function (d) {
+                return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
+              }).merge(marker).interrupt().transition(transition).attr('transform', function (d) {
+                return "translate(".concat(xScaleRug(d.value), ", ").concat(rugPosition.y - markerPos, ") rotate(180)");
+              });
+              marker.exit().remove();
+            }
 
             var markerText = _highlightGroup.selectAll('text.marker-text').data(data, function (d) {
               return d.key;
             });
 
             markerText.enter().append('text').attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18, ")");
             }).attr('class', function (d) {
               return _markerData.find(function (m) {
                 return m.key === d.key;
@@ -899,7 +907,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             }).attr('text-anchor', function (d) {
               return _annoPos(d.text, d.value).xAnchor;
             }).merge(markerText).interrupt().transition(transition).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 2 * markerPos - 2, ")");
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 18, ")");
             }).text(function (d) {
               return "".concat(d.text);
             }).attr('text-anchor', function (d) {
@@ -911,8 +919,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
               return d.key;
             });
 
-            markerTextValues.enter().append('text').attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(props.height - props.margin.bottom + 12 + splitAxisHeight, ")");
+            markerTextValues.enter().append('text') // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
+            .attr('transform', function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2, ")");
             }).attr('class', function (d) {
               return "marker-textvalue ".concat(d.key, " ").concat(classList);
             }).text(function (d) {
@@ -920,13 +929,38 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             }).attr('text-anchor', function (d) {
               return _annoPos(d.text, d.value).xAnchor;
             }).merge(markerTextValues).interrupt().transition(transition).attr('transform', function (d) {
-              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(props.height - props.margin.bottom + 12 + splitAxisHeight, ")");
-            }).text(function (d) {
+              return "translate(".concat(xScaleRug(d.value) + _annoPos(d.text, d.value).xPos, ", ").concat(rugPosition.y - 3 * markerRadius - props.rugProps.activeRugZoom * 2 - 2, ")");
+            }) // .attr('transform', d => `translate(${xScaleRug(d.value) + _annoPos(d.text, d.value).xPos}, ${props.height - props.margin.bottom + 12 + splitAxisHeight})`)
+            .text(function (d) {
               return "".concat(tooltipNumberFormatter(d.value));
             }).attr('text-anchor', function (d) {
               return _annoPos(d.text, d.value).xAnchor;
             });
-            markerTextValues.exit().remove();
+            markerTextValues.exit().remove(); // de-active old rugs
+
+            rugPlot.selectAll('rect').classed('active', false) // .style('stroke-width', props.rugProps.rugWidth)
+            // .style('stroke', 'none')
+            // .style('fill', props.rugProps.rugColor)
+            .attr('x', function (r) {
+              return _markerData.find(function (d) {
+                return d.key === r.key;
+              }) ? xScaleRug(r[props.dataParams.value]) - props.rugProps.highlightWidth / 2 : xScaleRug(r[props.dataParams.value]) - props.rugProps.rugWidth / 2;
+            }).attr('y', rugPosition.y).attr('height', rugPosition.height).attr('width', function (r) {
+              return _markerData.find(function (d) {
+                return d.key === r.key;
+              }) ? props.rugProps.highlightWidth : props.rugProps.rugWidth;
+            }); // active rug for tooltip
+
+            data.forEach(function (element) {
+              rugPlot.select("rect.".concat(element.key)).classed(classList, true) // .style('stroke-width', props.rugProps.highlightWidth / 2)
+              // .style('stroke',
+              //   markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
+              .style('fill', _markerData.find(function (d) {
+                return d.key === element.key;
+              }) ? props.rugProps.highlightColor : props.rugProps.rugColor).attr('x', function (d) {
+                return xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2;
+              }).attr('y', rugPosition.y - props.rugProps.activeRugZoom).attr('height', rugPosition.height + props.rugProps.activeRugZoom * 2).attr('width', props.rugProps.highlightWidth).raise();
+            });
           }; // this.selection().select('.highlights').lower();
           // TOOLTIP AND HIGHLIGHTS
 
@@ -936,16 +970,18 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             _drawTooltips(_markerData, 'active'); // deselect old rugs
 
 
-            _this2.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false).style('stroke-width', props.rugProps.rugWidth).style('stroke', 'none').style('fill', props.rugProps.rugColor); // // highlight new data
+            _this2.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false) // .style('stroke-width', props.rugProps.rugWidth)
+            // .style('stroke', 'none')
+            .style('fill', props.rugProps.rugColor); // // highlight new data
 
 
             _markerData.forEach(function (element) {
-              //   this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', false);
-              //   this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', false);
-              //   this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', true);
-              //   this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', true);
-              //   this.selection().select(`.CountryRankingStrips .highlights text.marker-textvalue.${element.key}`).classed('active highlighted', true);
-              _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).classed('highlighted', true).style('stroke-width', props.rugProps.highlightWidth / 2).style('stroke', props.rugProps.highlightColor).style('fill', props.rugProps.highlightColor).raise();
+              _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).classed('highlighted', true) // .style('stroke-width', props.rugProps.highlightWidth / 2)
+              // .style('stroke', 'none')
+              .style('fill', props.rugProps.highlightColor).attr('x', function (d) {
+                return xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2;
+              }).attr('y', rugPosition.y).attr('height', rugPosition.height).interrupt().transition(transition).attr('width', props.rugProps.highlightWidth); // .raise();
+
             });
           };
 
@@ -959,28 +995,29 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
 
           var _setActiveTooltip = function _setActiveTooltip(el) {
             // draw hover label
-            _drawTooltips(el instanceof Array ? el : [el], 'active'); // this.selection().selectAll('.CountryRankingStrips .highlights path.marker-rug').classed('active', true);
-            // this.selection().selectAll('.CountryRankingStrips .highlights text.marker-text').classed('active', true);
-            // this.selection().selectAll('.CountryRankingStrips .highlights text.marker-textvalue').classed('active', true);
-            // // hide the highlighted labels
-            // markerData.forEach(element => {
-            //   this.selection().select(`.CountryRankingStrips .highlights path.marker-rug.${element.key}`).classed('active highlighted', false);
-            //   this.selection().select(`.CountryRankingStrips .highlights text.marker-text.${element.key}`).classed('active highlighted', false);
-            // });
-
+            _drawTooltips(el instanceof Array ? el : [el], 'active');
           }; // highlight the rugs
 
 
-          _setDefaultTooltip(); // this.selection().select('.CountryRankingStrips .highlights rect.highlight-bar')
+          _setDefaultTooltip();
 
-
-          rugBgBar.on('mouseenter mousemove touchstart touchmove', throttle(function () {
+          rugTouchArea.on('mouseenter mousemove touchstart touchmove', throttle(function () {
             if (!d3.event) return;
 
-            _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0]));
+            _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0])); // if split axis active then reposition it to accomodate the zoomed rugs
+            // splitAxis
+            //   .interrupt()
+            //   .transition(transition)
+            //   .attr('transform', `translate(0,${props.height - props.margin.bottom + 3 + props.rugProps.activeRugZoom / 2})`);
+
           }, 50));
-          rugBgBar.on('mouseleave touchend touchcancel', function () {
-            _setDefaultTooltip();
+          rugTouchArea.on('mouseleave touchend touchcancel', function () {
+            _setDefaultTooltip(); // if split axis active then reposition it to accomodate the zoomed rugs
+            // splitAxis
+            //   .interrupt()
+            //   .transition(transition)
+            //   .attr('transform', `translate(0,${props.height - props.margin.bottom})`);
+
           });
         }
       } // HISTOGRAM CODE
