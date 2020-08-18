@@ -40,7 +40,7 @@ class CountryRankingStrips extends ChartComponent {
       highlightWidth: 2,
       highlightColor: '#eec331',
       activeRugZoom: 4,
-      showTipMarker: true,
+      showTipMarker: false,
       getTooltipText: (key) => key,
       // tooltipNumberFormatter: (num) => num,
       customAxisLabels: [],
@@ -630,12 +630,12 @@ class CountryRankingStrips extends ChartComponent {
               // .style('stroke', 'none')
               .style('fill', props.rugProps.highlightColor)
               .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2)
-              .attr('y', rugPosition.y)
-              .attr('height', rugPosition.height)
+              .attr('y', rugPosition.y - props.rugProps.activeRugZoom)
+              .attr('height', rugPosition.height + props.rugProps.activeRugZoom * 2)
               .interrupt()
               .transition(transition)
               .attr('width', props.rugProps.highlightWidth);
-            // .raise();
+            this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).raise();
           });
         };
 
