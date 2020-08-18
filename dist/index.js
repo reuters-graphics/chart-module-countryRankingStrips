@@ -485,7 +485,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
         highlightWidth: 2,
         highlightColor: '#eec331',
         activeRugZoom: 4,
-        showTipMarker: true,
+        showTipMarker: false,
         getTooltipText: function getTooltipText(key) {
           return key;
         },
@@ -980,8 +980,9 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
               // .style('stroke', 'none')
               .style('fill', props.rugProps.highlightColor).attr('x', function (d) {
                 return xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2;
-              }).attr('y', rugPosition.y).attr('height', rugPosition.height).interrupt().transition(transition).attr('width', props.rugProps.highlightWidth); // .raise();
+              }).attr('y', rugPosition.y - props.rugProps.activeRugZoom).attr('height', rugPosition.height + props.rugProps.activeRugZoom * 2).interrupt().transition(transition).attr('width', props.rugProps.highlightWidth);
 
+              _this2.selection().select(".CountryRankingStrips .rugplot rect.".concat(element.key)).raise();
             });
           };
 
