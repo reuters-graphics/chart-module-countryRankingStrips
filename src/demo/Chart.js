@@ -121,32 +121,32 @@ class ChartComponent extends React.Component {
 
   // A resize function to redraw the chart.
   resize = debounce(() => {
-    this.chart1.data(dataAsia).props({
+    this.chart1.data(DATA.deaths).props({
       rugProps: {
-        height: 26,
+        // height: 26,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
-        customAxisLabels: [{ pos: min(dataAsia, 'value').value, label: 'left-label' }, { pos: max(dataAsia, 'value').value, label: 'right-label' }],
-        showSplitAxis: false,
+        // customAxisLabels: [{ pos: min(dataAsia, 'value').value, label: 'left-label' }, { pos: max(dataAsia, 'value').value, label: 'right-label' }],
+        // showSplitAxis: false,
         annotation: [
           {
-            key: 'PK',
-            text: 'PK',
+            key: 'IN',
+            text: 'IN',
           },
-          // {
-          //   key: 'ME',
-          //   text: 'ME',
-          // },
-          // {
-          //   key: 'US',
-          //   // text: 'ME',
-          // },
+        // {
+        //   key: 'ME',
+        //   text: 'ME',
+        // },
+        // {
+        //   key: 'US',
+        //   // text: 'ME',
+        // },
         ],
       },
     }).draw();
     this.chart2.props({
       rugProps: {
-        height: 26,
+        // height: 26,
         // getTooltipText: (key) => key,
         // highlightColor: '#ee665b',
         customAxisLabels: [{ pos: min(DATA.deathsPct, 'value').value, label: '← decreasing most' }, { pos: max(DATA.deathsPct, 'value').value, label: 'increasing most →' }],
@@ -177,7 +177,7 @@ class ChartComponent extends React.Component {
     // Use our chart module.
     this.chart1
       .selection(this.chart1Container.current)
-      .data(dataNAmerica)
+      .data(DATA.cases)
       .props({
         chartTitle: 'global cases',
         locale: 'en',
@@ -197,18 +197,18 @@ class ChartComponent extends React.Component {
           height: 18,
           getTooltipText: (key) => `${key}works!`,
           customAxisFormat: true,
-          customAxisLabels: [{ pos: min(dataNAmerica, 'value').value, label: '| decreasing most' }, { pos: max(dataNAmerica, 'value').value, label: 'increasing most |' }],
-          rugColor: 'rgba(255, 255, 255, 0.75)',
-          highlightWidth: 2,
-          highlightColor: '#eec331',
-          showSplitAxis: true,
-          splitAxis: {
-            value: 0,
-            // colors: ['green', 'red'],
-          },
+          // customAxisLabels: [{ pos: min(dataNAmerica, 'value').value, label: '| decreasing most' }, { pos: max(dataNAmerica, 'value').value, label: 'increasing most |' }],
+          // rugColor: 'rgba(255, 255, 255, 0.75)',
+          // highlightWidth: 2,
+          // highlightColor: '#eec331',
+          // showSplitAxis: true,
+          // splitAxis: {
+          //   value: 0,
+          //   // colors: ['green', 'red'],
+          // },
           annotation: [
             {
-              key: 'US',
+              key: 'IN',
               // text: 'India',
             },
             // {

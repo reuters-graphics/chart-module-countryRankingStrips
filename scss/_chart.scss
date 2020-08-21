@@ -1,6 +1,6 @@
 #{$CountryRankingStrips-container} {
 
-  $text-color: rgba(255, 255, 255, 0.75);
+  $text-color: rgba(255, 255, 255, 1);
   $dark-blue: #2f353f;
   $area-color: rgba(255, 255, 255, 0.25);
   $yellow: #fce587;
@@ -31,12 +31,17 @@
     }
     .rugplot{
       rect {
+        paint-order: stroke fill;
         fill: $text-color;
-        opacity: 0.55;
+        opacity: 0.25;
+
+        // transition: all 0.5s ease-in-out;
 
         &.highlighted {
-          // fill: $dark-yellow;
+          fill: $dark-yellow;
           opacity: 1;
+          stroke-width: 0.5;
+          stroke: $dark-blue;
         }
 
         &.active {

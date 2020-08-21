@@ -36,11 +36,11 @@ class CountryRankingStrips extends ChartComponent {
     rugProps: {
       height: 16,
       rugWidth: 1,
-      rugColor: 'rgba(255, 255, 255, 0.75)',
+      rugColor: 'rgba(255, 255, 255, 1)',
       highlightWidth: 2,
       highlightColor: '#eec331',
-      activeRugZoom: 4,
-      showTipMarker: true,
+      activeRugZoom: 10,
+      showTipMarker: false,
       getTooltipText: (key) => key,
       textHeight: 16,
       // tooltipNumberFormatter: (num) => num,
@@ -146,6 +146,39 @@ class CountryRankingStrips extends ChartComponent {
     // add chart plot holder
     const plot = chartSVG.appendSelect('g.plot')
       .attr('class', 'plot');
+
+    // add DROP-SHADOW filter
+    const dropShadow = {
+      stdDeviation: 0.5,
+      dx: 0,
+      dy: 0,
+      slope: 0.5,
+      type: 'linear',
+    };
+    const filter = chartSVG.appendSelect('defs');
+
+    filter.appendSelect('filter')
+      .attr('id', 'rugplotDropShadow')
+      .attr('filterUnits', 'userSpaceOnUse');
+
+    filter.appendSelect('feGaussianBlur')
+      .attr('in', 'SourceAlpha')
+      .attr('stdDeviation', parseInt(dropShadow.stdDeviation));
+
+    filter.appendSelect('feOffset')
+      .attr('dx', parseInt(dropShadow.dx))
+      .attr('dy', parseInt(dropShadow.dy));
+
+    const feComponentTransfer = filter.appendSelect('feComponentTransfer');
+    feComponentTransfer
+      .appendSelect('feFuncA')
+      .attr('type', dropShadow.type)
+      .attr('slope', parseFloat(dropShadow.slope));
+
+    const feMerge = filter.appendSelect('feMerge');
+    feMerge.appendSelect('feMergeNode');
+    feMerge.appendSelect('feMergeNode').attr('in', 'SourceGraphic');
+    /* --- */
 
     // add axis
     if (props.histogram || props.densityPlot) {
@@ -344,7 +377,9 @@ class CountryRankingStrips extends ChartComponent {
       const rugPosition = {
         y: props.height - props.margin.bottom - 13,
         height: props.rugProps.height,
+        zoom: (props.rugProps.height + props.rugProps.activeRugZoom * 2) / props.rugProps.height,
       };
+
       var xScaleRug;
       // add rugplot axis
       if (props.histogram || props.densityPlot) {
@@ -386,6 +421,7 @@ class CountryRankingStrips extends ChartComponent {
       const splitAxis = chartSVG.appendSelect('g.split-axis')
         .attr('class', 'split-axis')
         .attr('transform', `translate(0,${rugPosition.y + rugPosition.height + splitAxisHeight * 2})`);
+
       if (props.rugProps.showSplitAxis && props.rugProps.splitAxis) {
         // splitAxisHeight = 2;
         // check if split point value is in domain
@@ -442,13 +478,15 @@ class CountryRankingStrips extends ChartComponent {
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
         .attr('width', props.rugProps.rugWidth)
+        .attr('transform-origin', d => `${xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2} ${rugPosition.y + rugPosition.height / 2}`)
         .merge(rugs)
         .transition(transition)
         .attr('data-value', d => `${d[props.dataParams.value]}`)
         .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2)
         .attr('y', rugPosition.y)
         .attr('height', rugPosition.height)
-        .attr('width', props.rugProps.rugWidth);
+        .attr('width', props.rugProps.rugWidth)
+        .attr('transform-origin', d => `${xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2} ${rugPosition.y + rugPosition.height / 2}`);
 
       rugs.exit().remove();
       plot.raise();
@@ -580,64 +618,30 @@ class CountryRankingStrips extends ChartComponent {
             .attr('text-anchor', d => _annoPos(d.text, d.value).xAnchor);
 
           markerTextValues.exit().remove();
-
           // de-active old rugs
-          rugPlot.selectAll('rect').classed('active', false)
-            // .style('stroke-width', props.rugProps.rugWidth)
-            // .style('stroke', 'none')
-            // .style('fill', props.rugProps.rugColor)
-            .attr('x', r => {
-              return markerData.find(d => d.key === r.key) ? xScaleRug(r[props.dataParams.value]) - props.rugProps.highlightWidth / 2 : xScaleRug(r[props.dataParams.value]) - props.rugProps.rugWidth / 2;
-            })
-            .attr('y', rugPosition.y)
-            .attr('height', rugPosition.height)
-            .attr('width', r => {
-              return markerData.find(d => d.key === r.key) ? props.rugProps.highlightWidth : props.rugProps.rugWidth;
-            });
+          rugPlot.selectAll('rect').classed(classList, false)
+            .style('fill', element =>
+              markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
+            .style('transform', element =>
+              markerData.find(d => d.key === element.key) ? `scaleX(${rugPosition.zoom}) scaleY(1)` : 'scaleX(1) scaleY(1)');
 
           // active rug for tooltip
           data.forEach(element => {
             rugPlot.select(`rect.${element.key}`).classed(classList, true)
-              // .style('stroke-width', props.rugProps.highlightWidth / 2)
-              // .style('stroke',
-              //   markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
               .style('fill',
                 markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
-              .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2)
-              .attr('y', rugPosition.y - props.rugProps.activeRugZoom)
-              .attr('height', rugPosition.height + props.rugProps.activeRugZoom * 2)
-              .attr('width', props.rugProps.highlightWidth)
-              .raise();
+              // .interrupt()
+              // .transition(transition)
+              .style('transform', `scaleX(${rugPosition.zoom}) scaleY(${rugPosition.zoom})`);
+
+            rugPlot.select(`rect.${element.key}`).raise();
           });
         };
-
-        // this.selection().select('.highlights').lower();
 
         // TOOLTIP AND HIGHLIGHTS
         const _setDefaultTooltip = () => {
           // draw highlight label
-          _drawTooltips(markerData, 'active');
-
-          // deselect old rugs
-          this.selection().selectAll('.CountryRankingStrips .rugplot rect').classed('highlighted', false)
-            // .style('stroke-width', props.rugProps.rugWidth)
-            // .style('stroke', 'none')
-            .style('fill', props.rugProps.rugColor);
-
-          // // highlight new data
-          markerData.forEach(element => {
-            this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).classed('highlighted', true)
-              // .style('stroke-width', props.rugProps.highlightWidth / 2)
-              // .style('stroke', 'none')
-              .style('fill', props.rugProps.highlightColor)
-              .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.highlightWidth / 2)
-              .attr('y', rugPosition.y - props.rugProps.activeRugZoom)
-              .attr('height', rugPosition.height + props.rugProps.activeRugZoom * 2)
-              .interrupt()
-              .transition(transition)
-              .attr('width', props.rugProps.highlightWidth);
-            this.selection().select(`.CountryRankingStrips .rugplot rect.${element.key}`).raise();
-          });
+          _drawTooltips(markerData, 'active highlighted');
         };
 
         const _getActiveTooltip = (pos) => {
