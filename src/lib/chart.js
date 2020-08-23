@@ -1,5 +1,8 @@
 import ChartComponent from './base/ChartComponent';
 import d3 from './utils/d3';
+import { select } from 'd3-selection';
+import transition from 'd3-transition';
+
 // import { num2unitwords } from './utils/utils';
 
 import D3Locale from '@reuters-graphics/d3-locale';
@@ -479,7 +482,9 @@ class CountryRankingStrips extends ChartComponent {
         .attr('height', rugPosition.height)
         .attr('width', props.rugProps.rugWidth)
         .attr('transform-origin', d => `${xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2} ${rugPosition.y + rugPosition.height / 2}`)
+        // .style('transition', null)
         .merge(rugs)
+        // .style('transition', null)
         .transition(transition)
         .attr('data-value', d => `${d[props.dataParams.value]}`)
         .attr('x', d => xScaleRug(d[props.dataParams.value]) - props.rugProps.rugWidth / 2)
@@ -620,8 +625,10 @@ class CountryRankingStrips extends ChartComponent {
           markerTextValues.exit().remove();
           // de-active old rugs
           rugPlot.selectAll('rect').classed(classList, false)
+            // .style('transition', 'all 0.2s')
             .style('fill', element =>
               markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
+            .transition('end', transition)
             .style('transform', element =>
               markerData.find(d => d.key === element.key) ? `scaleX(${rugPosition.zoom}) scaleY(1)` : 'scaleX(1) scaleY(1)');
 
@@ -630,8 +637,7 @@ class CountryRankingStrips extends ChartComponent {
             rugPlot.select(`rect.${element.key}`).classed(classList, true)
               .style('fill',
                 markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
-              // .interrupt()
-              // .transition(transition)
+              .transition('end', transition)
               .style('transform', `scaleX(${rugPosition.zoom}) scaleY(${rugPosition.zoom})`);
 
             rugPlot.select(`rect.${element.key}`).raise();
@@ -659,7 +665,7 @@ class CountryRankingStrips extends ChartComponent {
         // highlight the rugs
         _setDefaultTooltip();
 
-        rugTouchArea.on('mouseenter mousemove touchstart touchmove', throttle(() => {
+        rugTouchArea.on('mouseover mousemove touchenter touchstart touchmove', throttle(() => {
           if (!d3.event) return;
           _setActiveTooltip(_getActiveTooltip(d3.mouse(chartSVG.node())[0]));
 
@@ -670,7 +676,7 @@ class CountryRankingStrips extends ChartComponent {
           //   .attr('transform', `translate(0,${props.height - props.margin.bottom + 3 + props.rugProps.activeRugZoom / 2})`);
         }, 50));
 
-        rugTouchArea.on('mouseleave touchend touchcancel', () => {
+        rugTouchArea.on('mouseout touchleave touchcancel', () => {
           _setDefaultTooltip();
           // if split axis active then reposition it to accomodate the zoomed rugs
           // splitAxis
