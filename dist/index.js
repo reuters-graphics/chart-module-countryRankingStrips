@@ -616,7 +616,8 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
       var _node$getBoundingClie = node.getBoundingClientRect(),
           width = _node$getBoundingClie.width;
 
-      var transition = d3.transition().duration(750); // number formatters
+      var transition = d3.transition().duration(750);
+      var transitionFast = d3.transition().duration(10); // number formatters
 
       var locale = new D3Locale(props.locale);
       var numFormat = locale.format(','); // const num2unitwords = locale.format('.3~s');
@@ -1053,7 +1054,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
               return _markerData.find(function (d) {
                 return d.key === element.key;
               }) ? props.rugProps.highlightColor : props.rugProps.rugColor;
-            }).transition('end', transition).style('transform', function (element) {
+            }).transition('end', transitionFast).style('transform', function (element) {
               return _markerData.find(function (d) {
                 return d.key === element.key;
               }) ? "scaleX(".concat(rugPosition.zoom, ") scaleY(1)") : 'scaleX(1) scaleY(1)';
@@ -1062,7 +1063,7 @@ var CountryRankingStrips = /*#__PURE__*/function (_ChartComponent) {
             data.forEach(function (element) {
               rugPlot.select("rect.".concat(element.key)).classed(classList, true).style('fill', _markerData.find(function (d) {
                 return d.key === element.key;
-              }) ? props.rugProps.highlightColor : props.rugProps.rugColor).transition('end', transition).style('transform', "scaleX(".concat(rugPosition.zoom, ") scaleY(").concat(rugPosition.zoom, ")"));
+              }) ? props.rugProps.highlightColor : props.rugProps.rugColor).transition('end', transitionFast).style('transform', "scaleX(".concat(rugPosition.zoom, ") scaleY(").concat(rugPosition.zoom, ")"));
               rugPlot.select("rect.".concat(element.key)).raise();
             });
           }; // TOOLTIP AND HIGHLIGHTS

@@ -84,6 +84,8 @@ class CountryRankingStrips extends ChartComponent {
 
     const transition = d3.transition()
       .duration(750);
+    const transitionFast = d3.transition()
+      .duration(10);
 
     // number formatters
     const locale = new D3Locale(props.locale);
@@ -628,7 +630,7 @@ class CountryRankingStrips extends ChartComponent {
             // .style('transition', 'all 0.2s')
             .style('fill', element =>
               markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
-            .transition('end', transition)
+            .transition('end', transitionFast)
             .style('transform', element =>
               markerData.find(d => d.key === element.key) ? `scaleX(${rugPosition.zoom}) scaleY(1)` : 'scaleX(1) scaleY(1)');
 
@@ -637,7 +639,7 @@ class CountryRankingStrips extends ChartComponent {
             rugPlot.select(`rect.${element.key}`).classed(classList, true)
               .style('fill',
                 markerData.find(d => d.key === element.key) ? props.rugProps.highlightColor : props.rugProps.rugColor)
-              .transition('end', transition)
+              .transition('end', transitionFast)
               .style('transform', `scaleX(${rugPosition.zoom}) scaleY(${rugPosition.zoom})`);
 
             rugPlot.select(`rect.${element.key}`).raise();
