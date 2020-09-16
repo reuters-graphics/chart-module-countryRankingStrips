@@ -1,14 +1,14 @@
+import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import Chart from '../lib/chart.js';
 import ChartContainer from './furniture/ChartContainer';
 import React from 'react';
 import { base } from '@reuters-graphics/style-color/dist/categorical';
+import covidData from './covidData.json';
 import debounce from 'lodash/debounce';
 import defaultData from './defaultData.json';
-import covidData from './covidData.json';
-import popData from './popData.json';
 import max from 'lodash/maxBy';
 import min from 'lodash/minBy';
-import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
+import popData from './popData.json';
 
 const client = new AtlasMetadataClient();
 // format data
@@ -86,7 +86,7 @@ const pop = popData.metadata.map(d => {
 
 // cases
 const dataEurope = DATA.cases.filter(d => _getCountryList('Europe').includes(d.key));
-const dataAsia = DATA.cases.filter(d => _getCountryList('Asia').includes(d.key));
+const dataAsia = DATA.cases.filter(d => _getCountryList('Asia and the Middle East').includes(d.key));
 const dataLatam = DATA.cases.filter(d => _getCountryList('Latin America and the Caribbean').includes(d.key));
 const dataAfrica = DATA.cases.filter(d => _getCountryList('Africa').includes(d.key));
 const dataOceania = DATA.cases.filter(d => _getCountryList('Oceania').includes(d.key));
@@ -94,7 +94,7 @@ const dataNAmerica = DATA.casesPct.filter(d => _getCountryList('Northern America
 
 // deaths
 const dataEurope1 = DATA.deaths.filter(d => _getCountryList('Europe').includes(d.key));
-const dataAsia1 = DATA.deaths.filter(d => _getCountryList('Asia').includes(d.key));
+const dataAsia1 = DATA.deaths.filter(d => _getCountryList('Asia and the Middle East').includes(d.key));
 const dataLatam1 = DATA.deaths.filter(d => _getCountryList('Latin America and the Caribbean').includes(d.key));
 const dataAfrica1 = DATA.deaths.filter(d => _getCountryList('Africa').includes(d.key));
 const dataOceania1 = DATA.deaths.filter(d => _getCountryList('Oceania').includes(d.key));

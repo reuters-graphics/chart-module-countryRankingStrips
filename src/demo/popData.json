@@ -1493,7 +1493,7 @@
     {
       "iso_country_code_alpha_2": "AF",
       "country_name": "Afghanistan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "AFG",
       "iso_numberic_code": 4,
@@ -1519,7 +1519,7 @@
     {
       "iso_country_code_alpha_2": "AM",
       "country_name": "Armenia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "ARM",
       "iso_numberic_code": 51,
@@ -1545,7 +1545,7 @@
     {
       "iso_country_code_alpha_2": "AZ",
       "country_name": "Azerbaijan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "AZE",
       "iso_numberic_code": 31,
@@ -1571,7 +1571,7 @@
     {
       "iso_country_code_alpha_2": "BH",
       "country_name": "Bahrain",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "BHR",
       "iso_numberic_code": 48,
@@ -1597,7 +1597,7 @@
     {
       "iso_country_code_alpha_2": "BD",
       "country_name": "Bangladesh",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "BGD",
       "iso_numberic_code": 50,
@@ -1623,7 +1623,7 @@
     {
       "iso_country_code_alpha_2": "BT",
       "country_name": "Bhutan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "BTN",
       "iso_numberic_code": 64,
@@ -1649,7 +1649,7 @@
     {
       "iso_country_code_alpha_2": "BN",
       "country_name": "Brunei",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "BRN",
       "iso_numberic_code": 96,
@@ -1675,7 +1675,7 @@
     {
       "iso_country_code_alpha_2": "KH",
       "country_name": "Cambodia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "KHM",
       "iso_numberic_code": 116,
@@ -1701,7 +1701,7 @@
     {
       "iso_country_code_alpha_2": "CN",
       "country_name": "China",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "CHN",
       "iso_numberic_code": 156,
@@ -1727,7 +1727,7 @@
     {
       "iso_country_code_alpha_2": "CY",
       "country_name": "Cyprus",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "CYP",
       "iso_numberic_code": 196,
@@ -1753,7 +1753,7 @@
     {
       "iso_country_code_alpha_2": "KP",
       "country_name": "Democratic People's Republic of Korea",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "PRK",
       "iso_numberic_code": 408,
@@ -1779,7 +1779,7 @@
     {
       "iso_country_code_alpha_2": "GE",
       "country_name": "Georgia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "GEO",
       "iso_numberic_code": 268,
@@ -1805,7 +1805,7 @@
     {
       "iso_country_code_alpha_2": "HK",
       "country_name": "Hong Kong",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "HKG",
       "iso_numberic_code": 344,
@@ -1831,7 +1831,7 @@
     {
       "iso_country_code_alpha_2": "IN",
       "country_name": "India",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "IND",
       "iso_numberic_code": 356,
@@ -1857,7 +1857,7 @@
     {
       "iso_country_code_alpha_2": "ID",
       "country_name": "Indonesia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "IDN",
       "iso_numberic_code": 360,
@@ -1883,7 +1883,7 @@
     {
       "iso_country_code_alpha_2": "IR",
       "country_name": "Iran",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "IRN",
       "iso_numberic_code": 364,
@@ -1909,7 +1909,7 @@
     {
       "iso_country_code_alpha_2": "IQ",
       "country_name": "Iraq",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "IRQ",
       "iso_numberic_code": 368,
@@ -1935,7 +1935,7 @@
     {
       "iso_country_code_alpha_2": "IL",
       "country_name": "Israel",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "ISR",
       "iso_numberic_code": 376,
@@ -1961,7 +1961,7 @@
     {
       "iso_country_code_alpha_2": "JP",
       "country_name": "Japan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "JPN",
       "iso_numberic_code": 392,
@@ -1987,7 +1987,7 @@
     {
       "iso_country_code_alpha_2": "JO",
       "country_name": "Jordan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "JOR",
       "iso_numberic_code": 400,
@@ -2013,7 +2013,7 @@
     {
       "iso_country_code_alpha_2": "KZ",
       "country_name": "Kazakhstan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Central Asia",
       "iso_country_alpha_3": "KAZ",
       "iso_numberic_code": 398,
@@ -2039,7 +2039,7 @@
     {
       "iso_country_code_alpha_2": "KW",
       "country_name": "Kuwait",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "KWT",
       "iso_numberic_code": 414,
@@ -2065,7 +2065,7 @@
     {
       "iso_country_code_alpha_2": "KG",
       "country_name": "Kyrgyzstan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Central Asia",
       "iso_country_alpha_3": "KGZ",
       "iso_numberic_code": 417,
@@ -2091,7 +2091,7 @@
     {
       "iso_country_code_alpha_2": "LA",
       "country_name": "Laos",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "LAO",
       "iso_numberic_code": 418,
@@ -2117,7 +2117,7 @@
     {
       "iso_country_code_alpha_2": "LB",
       "country_name": "Lebanon",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "LBN",
       "iso_numberic_code": 422,
@@ -2143,7 +2143,7 @@
     {
       "iso_country_code_alpha_2": "MO",
       "country_name": "Macau",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "MAC",
       "iso_numberic_code": 446,
@@ -2169,7 +2169,7 @@
     {
       "iso_country_code_alpha_2": "MY",
       "country_name": "Malaysia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "MYS",
       "iso_numberic_code": 458,
@@ -2195,7 +2195,7 @@
     {
       "iso_country_code_alpha_2": "MV",
       "country_name": "Maldives",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "MDV",
       "iso_numberic_code": 462,
@@ -2221,7 +2221,7 @@
     {
       "iso_country_code_alpha_2": "MN",
       "country_name": "Mongolia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "MNG",
       "iso_numberic_code": 496,
@@ -2247,7 +2247,7 @@
     {
       "iso_country_code_alpha_2": "MM",
       "country_name": "Myanmar",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "MMR",
       "iso_numberic_code": 104,
@@ -2273,7 +2273,7 @@
     {
       "iso_country_code_alpha_2": "NP",
       "country_name": "Nepal",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "NPL",
       "iso_numberic_code": 524,
@@ -2299,7 +2299,7 @@
     {
       "iso_country_code_alpha_2": "OM",
       "country_name": "Oman",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "OMN",
       "iso_numberic_code": 512,
@@ -2325,7 +2325,7 @@
     {
       "iso_country_code_alpha_2": "PK",
       "country_name": "Pakistan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "PAK",
       "iso_numberic_code": 586,
@@ -2351,7 +2351,7 @@
     {
       "iso_country_code_alpha_2": "PS",
       "country_name": "Palestine",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "PSE",
       "iso_numberic_code": 275,
@@ -2377,7 +2377,7 @@
     {
       "iso_country_code_alpha_2": "PH",
       "country_name": "Philippines",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "PHL",
       "iso_numberic_code": 608,
@@ -2403,7 +2403,7 @@
     {
       "iso_country_code_alpha_2": "QA",
       "country_name": "Qatar",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "QAT",
       "iso_numberic_code": 634,
@@ -2429,7 +2429,7 @@
     {
       "iso_country_code_alpha_2": "SA",
       "country_name": "Saudi Arabia",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "SAU",
       "iso_numberic_code": 682,
@@ -2455,7 +2455,7 @@
     {
       "iso_country_code_alpha_2": "SG",
       "country_name": "Singapore",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "SGP",
       "iso_numberic_code": 702,
@@ -2481,7 +2481,7 @@
     {
       "iso_country_code_alpha_2": "KR",
       "country_name": "South Korea",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "KOR",
       "iso_numberic_code": 410,
@@ -2507,7 +2507,7 @@
     {
       "iso_country_code_alpha_2": "LK",
       "country_name": "Sri Lanka",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Southern Asia",
       "iso_country_alpha_3": "LKA",
       "iso_numberic_code": 144,
@@ -2533,7 +2533,7 @@
     {
       "iso_country_code_alpha_2": "SY",
       "country_name": "Syria",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "SYR",
       "iso_numberic_code": 760,
@@ -2559,7 +2559,7 @@
     {
       "iso_country_code_alpha_2": "TW",
       "country_name": "Taiwan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Eastern Asia",
       "iso_country_alpha_3": "TWN",
       "iso_numberic_code": 158,
@@ -2570,7 +2570,7 @@
     {
       "iso_country_code_alpha_2": "TJ",
       "country_name": "Tajikistan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Central Asia",
       "iso_country_alpha_3": "TJK",
       "iso_numberic_code": 762,
@@ -2596,7 +2596,7 @@
     {
       "iso_country_code_alpha_2": "TH",
       "country_name": "Thailand",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "THA",
       "iso_numberic_code": 764,
@@ -2622,7 +2622,7 @@
     {
       "iso_country_code_alpha_2": "TL",
       "country_name": "Timor-Leste",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "TLS",
       "iso_numberic_code": 626,
@@ -2648,7 +2648,7 @@
     {
       "iso_country_code_alpha_2": "TR",
       "country_name": "Turkey",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "TUR",
       "iso_numberic_code": 792,
@@ -2674,7 +2674,7 @@
     {
       "iso_country_code_alpha_2": "TM",
       "country_name": "Turkmenistan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Central Asia",
       "iso_country_alpha_3": "TKM",
       "iso_numberic_code": 795,
@@ -2700,7 +2700,7 @@
     {
       "iso_country_code_alpha_2": "AE",
       "country_name": "United Arab Emirates",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "ARE",
       "iso_numberic_code": 784,
@@ -2726,7 +2726,7 @@
     {
       "iso_country_code_alpha_2": "UZ",
       "country_name": "Uzbekistan",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Central Asia",
       "iso_country_alpha_3": "UZB",
       "iso_numberic_code": 860,
@@ -2752,7 +2752,7 @@
     {
       "iso_country_code_alpha_2": "VN",
       "country_name": "Vietnam",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "South-Eastern Asia",
       "iso_country_alpha_3": "VNM",
       "iso_numberic_code": 704,
@@ -2778,7 +2778,7 @@
     {
       "iso_country_code_alpha_2": "YE",
       "country_name": "Yemen",
-      "un_region": "Asia",
+      "un_region": "Asia and the Middle East",
       "un_subregion": "Western Asia",
       "iso_country_alpha_3": "YEM",
       "iso_numberic_code": 887,
